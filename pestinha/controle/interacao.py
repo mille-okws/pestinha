@@ -11,6 +11,8 @@ from ..log import log
 import time
 from PySide6.QtWidgets import QMenu
 from ..body.pet import cursor_pos
+from ..core.conversa import criar_provedor
+from ..ui.conversa import JanelaConversa
 from ..ajustes import (
     INSATISFACAO_NOTEBOOK,
     COOLDOWN_CUTUCADA as POKE_COOLDOWN,
@@ -127,6 +129,7 @@ class InteracaoMixin:
         item("Mostrar o notebook" if self.mesa.escondido else "Esconder o notebook",
              self.menu_alternar_notebook)
         item("Fazer uma travessura agora", self.menu_mischief, perms["travessuras"])
+        item("Conversar...", self.abrir_conversa, perms["conversa"])
         menu.addSeparator()
         item("Cantinho do castigo", lambda: self.castigo.toggle(self.bounds()))
         item("Painel de protesto", lambda: self.floats.toggle("greve"))
@@ -184,3 +187,25 @@ class InteracaoMixin:
     def menu_pedir_trabalho(self):
         """Menu: 'Pedir para trabalhar' (ele pode aceitar, ou recusar com frustração)."""
         self.mesa.pedir(time.monotonic())
+
+    def abrir_conversa(self):
+        """Menu: 'Conversar...' (só com a permissão ligada e o pet na tela). Não mexe no cérebro nem na memória."""
+        if not self.perms["conversa"] or not self.pet.isVisible():
+            return
+        if self.conversa is not None:
+            self.conversa.raise_()
+            self.conversa.activateWindow()
+            return
+        self.conversa = JanelaConversa(criar_provedor("simulado"), self.nome,
+                                       lambda: self.pet_state.emotion)
+        self.conversa.fechada.connect(self._conversa_fechada)
+        self.conversa.show()
+
+    def _conversa_fechada(self):
+        """A janela de conversa foi fechada (por você, pela permissão ou pelo pânico)."""
+        self.conversa = None
+
+    def fechar_conversa(self):
+        """Fecha a janela de conversa, se estiver aberta (cancela a resposta em andamento)."""
+        if self.conversa is not None:
+            self.conversa.close()

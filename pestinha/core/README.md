@@ -9,6 +9,7 @@ Cérebro e regras puras: rede neural, emoção, homeostase, memória, condiciona
 | Arquivo | O que faz |
 |---|---|
 | `conditioning.py` | Ele aprende a reagir ANTES do que costuma acontecer com ele. |
+| `conversa.py` | Regras puras da conversa em texto com o pet: limites, contexto mínimo, provedores e validação da resposta. |
 | `emotion.py` | Da atividade dos neurônios motores para UMA emoção. |
 | `episodic.py` | O que aconteceu de verdade, e o que fazer da próxima vez. |
 | `homeostasis.py` | Variáveis internas que o pet tenta manter em equilíbrio. |

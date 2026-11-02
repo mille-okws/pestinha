@@ -31,6 +31,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_castigo_real.py` | Cantinho no app inteiro, com relógio virtual: soltar no ar, pousar, ficar preso e reagir pela rede. |
 | `test_condicionamento.py` | Testes do condicionamento: aprender a reagir antes, extinguir, e persistir. |
 | `test_conteudo.py` | Etapa 2 do multipet: conteúdo por pet (frases, cartazes, memes, imagens). |
+| `test_conversa.py` | Conversa em texto (opcional): limites, provedor simulado, janela sem travar e integração com o app. |
 | `test_escolha_pet.py` | Etapa 3 do multipet: escolha do personagem nas configurações e o nome certo em cada texto. |
 | `test_festa.py` | Fogos de artifício ligados à rede e brincadeira mais animada quando feliz. |
 | `test_homeostase.py` | Homeostase: trabalhar é estímulo, então o tédio não sobe enquanto ele programa. |

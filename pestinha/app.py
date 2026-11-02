@@ -187,6 +187,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
 
         # ----- interface -----
         self.settings = None
+        self.conversa = None        # janela de conversa (opcional; ver controle/interacao.py)
         self.tray = Tray(self.nome)
         self.tray.open_settings.connect(self.open_settings)
         self.tray.open_monitor.connect(lambda: self.floats.open("neural"))
