@@ -133,6 +133,14 @@ ZZZ_QUANTIDADE = 3
 ZZZ_PERIODO = 2.4               # s que cada Z leva para subir e sumir
 
 # ---------------------------------------------------------------------------
+# Conversa em texto (opcional, desligada por padrão: permissão "conversa")
+# ---------------------------------------------------------------------------
+CONVERSA_MAX_ENTRADA = 300      # caracteres por mensagem sua
+CONVERSA_MAX_RESPOSTA = 600     # caracteres por resposta (o resto é cortado)
+CONVERSA_TEMPO_MAX = 20.0       # s esperando uma resposta antes de desistir
+CONVERSA_MAX_LINHAS = 200       # linhas guardadas na janela (só na memória, nunca em disco)
+
+# ---------------------------------------------------------------------------
 # Validação
 # ---------------------------------------------------------------------------
 
@@ -210,6 +218,10 @@ _LIMITES = {
     "LADO_JANELA_PET": (int, 100, 1000),
     "ZZZ_QUANTIDADE": (int, 0, 20),
     "ZZZ_PERIODO": (float, 0.1, 60.0),
+    "CONVERSA_MAX_ENTRADA": (int, 10, 4000),
+    "CONVERSA_MAX_RESPOSTA": (int, 50, 8000),
+    "CONVERSA_TEMPO_MAX": (float, 1.0, 300.0),
+    "CONVERSA_MAX_LINHAS": (int, 10, 5000),
 }
 
 

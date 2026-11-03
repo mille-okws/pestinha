@@ -79,6 +79,8 @@ class SessaoMixin:
         self.ball.setVisible(bola_visivel)
         if not visible or not self.perms["fogos"]:
             self.festa.fogos.recolher()
+        if not visible or not self.perms["conversa"]:
+            self.fechar_conversa()                   # desligada, escondido ou pânico: a conversa fecha
         self.tray.set_state(self.paused, self.hidden, self.perms["modo_teste"])
 
     def open_settings(self):
@@ -188,6 +190,7 @@ class SessaoMixin:
     def quit(self):
         """Salva tudo e fecha o programa."""
         self.save()
+        self.fechar_conversa()
         self.mesa.fechar()
         self.festa.fechar()
         self.revolucao.fechar()

@@ -41,6 +41,20 @@ abertura. Os originais não são apagados: ficam em `memory/legado/<pet>/`. Se a
 concluída (por exemplo, um arquivo já existe com outro conteúdo), nada é sobrescrito, ele continua usando
 os arquivos antigos e avisa no ícone da bandeja.
 
+## Conversa em texto (opcional, desligada por padrão)
+
+Só existe se você ligar **Conversar em texto** em Configurações. Hoje ela usa apenas o **modo simulado**:
+respostas prontas, sem modelo de linguagem, e **nada sai do computador**.
+
+- O que vai para quem responde: só o texto que você digitou, o nome do pet e a emoção dele no momento.
+  Nunca títulos, conteúdo de janelas, a rotina ou a memória do pet.
+- A conversa fica só na janela, na memória do programa. **Não é gravada** em `memory/` nem no log, e some
+  quando você fecha a janela.
+- Ela não muda a rede neural, o comportamento nem a memória do pet.
+- Se um dia for ligado um provedor que envia mensagens para fora (uma API na internet), a janela de conversa
+  diz isso antes da primeira mensagem, e a chave do provedor fica numa variável de ambiente, nunca no código
+  nem em arquivos do repositório.
+
 ## Como apagar
 
 - Na tela de configurações, **Apagar histórico** apaga a rotina (`timeline.csv`), inclusive o minuto que

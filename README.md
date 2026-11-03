@@ -83,6 +83,13 @@ python main.py --direto
 | Rodinha do mouse | Gira |
 | Botão direito | Menu: cutucar, carinho, bolinha, dormir, travessura, trabalhar, notebook, cantinho do castigo, painéis, configurações, esconder, fechar |
 
+### Conversar em texto (experimental)
+
+Desligado por padrão. Ligue **Conversar em texto** em Configurações e use **Conversar...** no menu do botão
+direito. Por enquanto só existe o **modo simulado** (respostas prontas, nada sai do computador, nada é gravado),
+para testar a janela antes de ligar um modelo de linguagem de verdade. Para testar os erros, envie `/lento`,
+`/erro`, `/semrede` ou `/invalido`. Detalhes em [PRIVACIDADE.md](PRIVACIDADE.md) e em `pestinha/core/conversa.py`.
+
 ### Pânico
 
 `Ctrl + Alt + Shift + B` desliga tudo na hora, e ele continua desligado até você religar em

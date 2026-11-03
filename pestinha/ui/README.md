@@ -8,6 +8,7 @@ Janelas de interface: tela de permissões, bandeja, passo a passo, monitor neura
 
 | Arquivo | O que faz |
 |---|---|
+| `conversa.py` | Caixa de texto para conversar com o pet; o provedor roda numa thread separada e a interface não espera. |
 | `float_manager.py` | Os painéis flutuantes (monitor neural e painel de protesto). |
 | `monitor.py` | O que a rede está fazendo agora, sincronizado com o corpo. |
 | `onboarding.py` | Passo a passo da primeira vez, com aviso de projeto em desenvolvimento. |
