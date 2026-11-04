@@ -51,10 +51,13 @@ fica salvo localmente e muda o jeito dele com o tempo.
 
 ## Requisitos
 
-- Windows 10 ou 11, macOS (Quartz/pyobjc) ou Linux com X11.
+- Windows 10 ou 11, macOS (Quartz/pyobjc), Linux com X11 ou o compositor **Hyprland** (Wayland).
 - Python 3.11 ou mais novo.
-- No Linux, para as janelas e o tempo ocioso: `xdotool`, `wmctrl` e `xprintidle`. Sem eles, o pet continua
+- No Linux com X11, para as janelas e o tempo ocioso: `xdotool`, `wmctrl` e `xprintidle`. Sem eles, o pet continua
   andando, mas não enxerga as janelas.
+- No Hyprland, nada extra para instalar: as leituras saem do `hyprctl` (que já vem com o compositor) e o pet se
+  move pelo IPC dele. No Hyprland o tempo ocioso não é exposto (o pet acha que você está sempre ativo) e o
+  atalho de pânico vira um `bind` no `hyprland.conf` (ver `pestinha/plataforma/hyprland.py`).
 - Cerca de 70 MB de RAM com ele rodando.
 
 ## Instalação e uso
@@ -221,10 +224,13 @@ As imagens e os textos de `assets/` não estão cobertos por esta licença
 
 ## Limitações conhecidas
 
-- macOS e Linux ainda não foram testados numa máquina real: a parte de leitura das janelas e do teclado foi
-  escrita e testada só nas partes de texto (ver `tests/test_plataforma.py`).
+- macOS e Linux (X11) ainda não foram testados numa máquina real: a parte de leitura das janelas e do teclado foi
+  escrita e testada só nas partes de texto (ver `tests/test_plataforma.py`). O backend do Hyprland foi testado
+  numa máquina de verdade com Hyprland (ver `tests/test_hyprland.py`).
 - No macOS, o pet precisa da permissão de Acessibilidade para o atalho Ctrl+Alt+Shift+B funcionar.
-- No Linux com Wayland, o pet não enxerga janelas nem o tempo ocioso, e o atalho global não funciona.
+- No Linux com Wayland que não seja o Hyprland, o pet não enxerga janelas nem o tempo ocioso, e o atalho global
+  não funciona. No Hyprland ele enxerga as janelas (via `hyprctl`), mas o tempo ocioso e o atalho global ficam
+  degradados (ver `pestinha/plataforma/hyprland.py`).
 - Pouco testado com escala de tela acima de 100% e com vários monitores. A tela cheia num monitor esconde o
   pet em todos.
 - Jogos em janela sem borda podem não ser detectados como tela cheia.

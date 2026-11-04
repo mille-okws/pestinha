@@ -1,5 +1,10 @@
 {
-  "PROGRAMMING": [],
+  "PROGRAMMING": [
+    "kitty",
+    "ghostty",
+    "nvim",
+    "hermes"
+  ],
   "DESIGNING": [],
   "GAMING": [],
   "BROWSING": [],

@@ -9,6 +9,7 @@ Tudo que depende do sistema operacional: programa em primeiro plano, tempo ocios
 | Arquivo | O que faz |
 |---|---|
 | `_comum.py` | Partes que os três sistemas compartilham: rodar comandos do sistema e o atalho global via pynput. |
+| `hyprland.py` | Linux (Hyprland, Wayland): as leituras saem do `hyprctl` (JSON) e o pet se move pelo `hl.dsp.window.move` do compositor, porque no Wayland o Qt não move a janela sozinho (o `QWidget.move()` é ignorado pelo compositor). |
 | `linux.py` | Linux (X11): xdotool e wmctrl para as janelas, xprintidle para o tempo ocioso, e pynput para o atalho. |
 | `macos.py` | MacOS: Quartz (pyobjc) para as janelas e o tempo ocioso; AppKit para o programa em primeiro plano. |
 | `windows.py` | Windows: a API do sistema (user32, dwmapi) via ctypes e pywin32. |

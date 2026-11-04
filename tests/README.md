@@ -34,6 +34,7 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_escolha_pet.py` | Etapa 3 do multipet: escolha do personagem nas configurações e o nome certo em cada texto. |
 | `test_festa.py` | Fogos de artifício ligados à rede e brincadeira mais animada quando feliz. |
 | `test_homeostase.py` | Homeostase: trabalhar é estímulo, então o tédio não sobe enquanto ele programa. |
+| `test_hyprland.py` | Backend Hyprland: as funções puras (JSON do hyprctl -> retângulos/nomes) são testadas com saídas de exemplo, em qualquer sistema; o caminho real só roda no Hyprland. |
 | `test_jorge.py` | Etapa 4 do multipet: o Jorge, segundo personagem, feito só de configuração e conteúdo. |
 | `test_melhorias_windows.py` | Melhorias para o Windows: tela cheia, vários monitores, pasta de dados, uma cópia só, início automático e fechamento seguro. |
 | `test_mesa.py` | Notebook: sentar e levantar pelo disparo do neurônio SENTAR. |

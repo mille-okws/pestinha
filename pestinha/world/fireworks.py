@@ -16,7 +16,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import QWidget
 
-from ..body.pet import overlay_flags, set_no_activate
+from ..body.pet import overlay_flags, reposicionar, set_no_activate
 from ..ajustes import (
     TAMANHO_JANELA_FOGOS as WIN,
     TEMPO_FOGUETE as ROCKET_TIME,
@@ -32,6 +32,7 @@ class Fireworks(QWidget):
     def __init__(self):
         """Cria a janela transparente dos fogos, que deixa o mouse passar."""
         super().__init__(None, overlay_flags() | Qt.WindowTransparentForInput)
+        self.setWindowTitle("Pestinha-fogos")
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.setFixedSize(WIN, WIN)
@@ -49,10 +50,14 @@ class Fireworks(QWidget):
 
     def launch(self, x, y):
         """Solta o foguete de (x, y), a posição do pet na tela."""
-        self.move(int(x - WIN / 2), int(y - WIN))
+        self._pos = (x - WIN / 2, y - WIN)
+        reposicionar(self, x - WIN / 2, y - WIN)
         self.rocket = [WIN / 2, WIN - 40.0, -380.0, 0.0]
         self.sparks = []
         self.show()
+        # no Hyprland o cliente pode ainda não existir no compositor: tenta de novo
+        for atraso in (100, 300, 800):
+            QTimer.singleShot(atraso, lambda: reposicionar(self, *self._pos))
         if not self._pausado:
             self.timer.start(16)
 

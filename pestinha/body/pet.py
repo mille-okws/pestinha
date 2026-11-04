@@ -7,6 +7,7 @@ A janela nunca pega o foco (o teclado continua no seu programa).
 """
 
 import math
+import os
 import random
 import time
 
@@ -55,6 +56,20 @@ def overlay_flags():
     )
 
 
+def reposicionar(widget, x, y, tamanho=None):
+    """
+    Põe a janela em (x, y). No X11/Windows/macOS o `move()` do Qt basta; no Hyprland
+    (Wayland) o compositor ignora o `move()` e quem move é o backend, pelo IPC dele.
+    `tamanho` é o tamanho desejado (largura, altura): vale quando o compositor
+    dilatou a janela (ex.: janela nascida tiled) e o tamanho atual não serve.
+    """
+    widget.move(int(x), int(y))
+    mover = getattr(plataforma, "mover_janela", None)
+    if mover is not None:
+        largura, altura = tamanho if tamanho is not None else (widget.width(), widget.height())
+        mover(os.getpid(), widget.windowTitle(), largura, altura, int(x), int(y))
+
+
 class PetWindow(QWidget):
     """Janela do pet: desenha o PetState e traduz o mouse em gestos (sinais)."""
 
@@ -67,6 +82,7 @@ class PetWindow(QWidget):
     def __init__(self, x, y, state):
         """Janela transparente do pet: o rosto é desenhado aqui e o mouse vira gestos (cutucar, arrastar, arremessar)."""
         super().__init__(None, overlay_flags())
+        self.setWindowTitle("Pestinha")
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.setFixedSize(WIN, WIN)
@@ -106,6 +122,9 @@ class PetWindow(QWidget):
         """Ao aparecer, a janela já é marcada para não roubar o foco do programa que você está usando."""
         super().showEvent(event)
         set_no_activate(self)
+        configurar = getattr(plataforma, "configurar_janela", None)
+        if configurar is not None:
+            configurar(os.getpid(), self.windowTitle(), self.width(), self.height())
 
     # ---------------- animação ----------------
 
@@ -127,7 +146,7 @@ class PetWindow(QWidget):
             sway = max(-35.0, min(35.0, -vx * 0.03))
             self.body.angle += (self._held_angle + sway - self.body.angle) * 0.25
 
-        self.move(int(self.body.x - CX), int(self.body.y - CY))
+        reposicionar(self, self.body.x - CX, self.body.y - CY)
         self.update()
 
     def paintEvent(self, _event):

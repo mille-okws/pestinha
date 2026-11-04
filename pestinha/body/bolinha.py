@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QWidget
 
 from ..ajustes import MEMORIA_SOLTURA as RELEASE_MEMORY, RAIO_BOLINHA as RADIUS
 from ..core.physics import Body
-from .pet import overlay_flags, set_no_activate
+from .pet import overlay_flags, reposicionar, set_no_activate
 
 
 def load_sprite(path):
@@ -32,6 +32,7 @@ class Ball(QWidget):
         self.kind = kind            # "bola" (brinquedo) ou "papel" (bolinha de papel da revolução)
         self.sprite = sprite        # foto da bolinha (load_sprite); None usa o desenho de reserva
         super().__init__(None, overlay_flags())
+        self.setWindowTitle("Pestinha-bolinha")
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.setFixedSize(RADIUS * 2 + 8, RADIUS * 2 + 8)
@@ -50,7 +51,7 @@ class Ball(QWidget):
 
     def place(self):
         """Reposiciona a janela da bolinha no lugar da física."""
-        self.move(int(self.body.x - self.width() / 2), int(self.body.y - self.height() / 2))
+        reposicionar(self, self.body.x - self.width() / 2, self.body.y - self.height() / 2)
 
     def handled_by_user(self, now):
         """Diz se você está com a bolinha agora ou a soltou há pouco (ela não deve ser chutada nesse meio tempo)."""

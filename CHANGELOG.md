@@ -1,5 +1,16 @@
 # Histórico de versões
 
+## Não lançado — suporte ao Hyprland (Wayland)
+
+- Novo backend `pestinha/plataforma/hyprland.py`: no Hyprland, as leituras (programa em primeiro plano,
+  janelas para pousar, tela cheia) saem do `hyprctl` e o pet se move pelo dispatcher `hl.dsp.window.move`
+  do compositor, porque no Wayland o `QWidget.move()` do Qt é ignorado. O movimento vai pelo socket IPC
+  do Hyprland (~0,1 ms por chamada), com fallback para o `hyprctl` quando o socket não existe.
+- Janelas do pet (pet, bolinha, objetos e fogos) ganham título próprio para o backend achar o endereço
+  de cada uma no compositor e deixá-la flutuante, fixada e sem decoração.
+- Limitações no Hyprland: o tempo ocioso não é exposto pelo compositor (o pet fica como "sempre ativo")
+  e o atalho de pânico precisa de um `bind` no `hyprland.conf` (ver o backend).
+
 ## 0.8.0 — melhorias para o Windows
 
 ### Correções

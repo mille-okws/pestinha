@@ -11,7 +11,7 @@ from PySide6.QtCore import QRectF, Qt, Signal
 from PySide6.QtGui import QColor, QFont, QPainter, QPixmap
 from PySide6.QtWidgets import QWidget
 
-from ..body.pet import overlay_flags, set_no_activate
+from ..body.pet import overlay_flags, reposicionar, set_no_activate
 from ..ajustes import GRAVIDADE as GRAVITY
 
 NOTE_SIZE = (180, 150)
@@ -24,6 +24,7 @@ class Thing(QWidget):
     def __init__(self, w, h):
         """Cria a janela do objeto com o tamanho `w` x `h`, transparente e sem foco."""
         super().__init__(None, overlay_flags())
+        self.setWindowTitle(f"Pestinha-objeto-{id(self)}")
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.setFixedSize(w, h)
@@ -44,7 +45,7 @@ class Thing(QWidget):
     def place(self, x, y):
         """Põe o objeto com o centro em (x, y)."""
         self.x, self.y = x, y
-        self.move(int(x - self.width() / 2), int(y - self.height() / 2))
+        reposicionar(self, x - self.width() / 2, y - self.height() / 2)
 
     def mousePressEvent(self, event):
         """Clique no objeto: avisa o app (ele conta como 'você viu')."""

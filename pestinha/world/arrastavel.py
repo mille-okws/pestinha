@@ -5,14 +5,19 @@ Não tem gravidade nem é alvo do pouso do pet. Não tira o foco do programa
 em que você está (WS_EX_NOACTIVATE) e fica sempre por cima. Arrasta-se
 segurando o botão esquerdo em qualquer ponto; a posição é lembrada em
 memory/panels.json (ver paths.py).
+
+No Hyprland (Wayland), o `move()` do Qt é ignorado e a janela nova nasce
+tiled (ocupando o workspace inteiro): por isso, aqui, quem flutua, fixa e
+move a janela é o backend da plataforma (`configurar_janela`/`mover_janela`),
+igual às janelas do pet.
 """
 
 from ..log import log
-from PySide6.QtCore import Qt, QRect
+from PySide6.QtCore import Qt, QRect, QTimer
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget
 
-from ..body.pet import set_no_activate
+from ..body.pet import reposicionar, set_no_activate
 from ..mathutil import valor_real
 from ..store import read_json, write_json
 
@@ -62,14 +67,23 @@ class FloatingWidget(QWidget):
         self.setWindowTitle(title)
         self.resize(*size)
         self.setMinimumSize(*minimum)
+        self._tamanho = (self.width(), self.height())
         self._grab = None
         saved = load_positions(app.paths.panels).get(key)
-        self.move(*posicao_acessivel(saved, default_pos, size))
+        self._pos_desejada = posicao_acessivel(saved, default_pos, size)
+        reposicionar(self, *self._pos_desejada, tamanho=self._tamanho)
 
     def showEvent(self, event):
         """Ao aparecer, não rouba o foco do programa que você está usando."""
         super().showEvent(event)
         set_no_activate(self)
+        # o compositor pode ter dilatado a janela para o tamanho do workspace:
+        # pede de volta o tamanho original antes de reposicionar
+        self.resize(*self._tamanho)
+        # No Hyprland o cliente pode ainda não existir no compositor neste instante:
+        # tenta de novo em 100/300/800 ms até o backend achar o endereço e configurar.
+        for atraso in (100, 300, 800):
+            QTimer.singleShot(atraso, lambda: reposicionar(self, *self._pos_desejada, tamanho=self._tamanho))
 
     def mousePressEvent(self, event):
         """Começa a arrastar o painel pelo clique."""
@@ -80,7 +94,9 @@ class FloatingWidget(QWidget):
     def mouseMoveEvent(self, event):
         """Move o painel enquanto você arrasta."""
         if self._grab is not None:
-            self.move(event.globalPosition().toPoint() - self._grab)
+            pos = event.globalPosition().toPoint() - self._grab
+            self._pos_desejada = (pos.x(), pos.y())
+            reposicionar(self, pos.x(), pos.y(), tamanho=self._tamanho)
 
     def mouseReleaseEvent(self, event):
         """Solta o painel e para de arrastar."""

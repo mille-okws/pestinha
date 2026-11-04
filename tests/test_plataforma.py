@@ -43,6 +43,10 @@ def test_cada_sistema_expoe_as_mesmas_funcoes():
 
 
 def test_a_plataforma_escolhida_e_a_do_sistema_atual():
+    from pestinha.plataforma import hyprland
+    if sys.platform not in ("win32", "darwin") and plataforma._no_hyprland():
+        assert plataforma._backend is hyprland
+        return
     esperado = {"win32": windows, "darwin": macos}.get(sys.platform, linux)
     assert plataforma._backend is esperado
 
