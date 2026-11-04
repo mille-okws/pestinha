@@ -253,7 +253,8 @@ def test_23_tela_inicial_grava_a_escolha(monkeypatch, tmp_path):
     monkeypatch.setattr(main_mod, "PestinhaApp", lambda store, p: None)
     monkeypatch.setattr(main_mod, "Onboarding", lambda nome: SimpleNamespace(exec=lambda: 1))
     monkeypatch.setattr(main_mod, "QApplication", lambda argv: SimpleNamespace(
-        setQuitOnLastWindowClosed=lambda v: None, setWindowIcon=lambda i: None, exec=lambda: 0))
+        setQuitOnLastWindowClosed=lambda v: None, setWindowIcon=lambda i: None, exec=lambda: 0,
+        platformName=lambda: "offscreen"))
     monkeypatch.setattr(sys, "argv", ["main.py"])
     main_mod.main()
     assert json.loads(paths.permissions.read_text(encoding="utf-8"))["fogos"] is escolha
@@ -276,7 +277,8 @@ def test_24_tela_inicial_apagar_tudo_funciona(monkeypatch, tmp_path):
     monkeypatch.setattr(main_mod, "Paths", lambda: paths)
     monkeypatch.setattr(main_mod, "Onboarding", lambda nome: SimpleNamespace(exec=lambda: 1))
     monkeypatch.setattr(main_mod, "QApplication", lambda argv: SimpleNamespace(
-        setQuitOnLastWindowClosed=lambda v: None, setWindowIcon=lambda i: None, exec=lambda: 0))
+        setQuitOnLastWindowClosed=lambda v: None, setWindowIcon=lambda i: None, exec=lambda: 0,
+        platformName=lambda: "offscreen"))
     monkeypatch.setattr(sys, "argv", ["main.py"])
     assert main_mod.main() == 0
     assert not paths.memory.exists()

@@ -5,7 +5,7 @@ que conferir antes de abrir um pull request.
 
 ## Ambiente
 
-- Windows 10 ou 11, macOS ou Linux com X11. Toda a leitura do sistema fica em `pestinha/plataforma/` (um módulo por sistema).
+- Windows 10 ou 11, macOS, Linux com X11 ou KDE Plasma 6 com Wayland. Toda a leitura do sistema fica em `pestinha/plataforma/` (um módulo por sistema).
 - Python 3.11.
 
 ```bash

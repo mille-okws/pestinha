@@ -10,6 +10,8 @@ O Pestinha roda só no seu computador. Ele não envia nada para a internet.
   cutucar) ou perto dele no cantinho do castigo.
 - Se uma janela cobre a tela inteira (para não aparecer em jogos ou apresentações).
 - A posição e o tamanho das janelas abertas, para ele poder pousar nas barras de título.
+- No KDE Plasma com Wayland, essas leituras vêm de um script do KWin (`pestinha/plataforma/kwin_ponte.js`)
+  que só existe enquanto o pet está aberto e manda geometria, pid e estado das janelas, nunca títulos.
 
 Ele **não** lê o conteúdo nem o título de nenhuma janela, página, documento ou conversa.
 

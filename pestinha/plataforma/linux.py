@@ -98,7 +98,8 @@ def janelas_visiveis(excluir, escala=1.0):
 
 
 def sem_foco_nativo(janela_id):
-    """O X11 não tem um jeito padrão de pedir isso: a janela do pet usa só as flags do Qt."""
+    """Tira a janela da barra de tarefas e do pager (o KDE ignora o Qt.Tool); o foco fica com as flags do Qt."""
+    rodar(["wmctrl", "-i", "-r", str(janela_id), "-b", "add,skip_taskbar,skip_pager"])
 
 
 def iniciar_atalho(callback):

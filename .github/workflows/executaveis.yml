@@ -18,11 +18,16 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt pyinstaller==6.22.3
+      - name: Tempo ocioso no KDE Plasma com Wayland (opcional, fora do requirements.txt)
+        if: runner.os == 'Linux'
+        run: pip install "pywayland>=0.4.19"
       - name: Gerar o executável
         shell: bash
         run: |
           EXTRA=""
           if [ "$RUNNER_OS" = "Windows" ]; then EXTRA="--windowed --hidden-import win32timezone"; fi
+          # --specpath build: caminho absoluto, senão o PyInstaller procura o script do KWin dentro de build/
+          if [ "$RUNNER_OS" = "Linux" ]; then EXTRA="--add-data $PWD/pestinha/plataforma/kwin_ponte.js:pestinha/plataforma"; fi
           python -m PyInstaller --noconfirm --onefile $EXTRA --name Pestinha \
             --distpath dist --workpath build/work --specpath build main.py
       - name: Montar a pasta de entrega (executável + assets + pets)

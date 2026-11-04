@@ -12,7 +12,13 @@ Dependências em requirements.txt. Pânico: Ctrl + Alt + Shift + B (desliga tudo
 
 import argparse
 import hashlib
+import os
 import sys
+
+# O Wayland não deixa uma janela escolher a própria posição: o pet roda pelo XWayland (os sentidos vêm do KWin).
+# A escolha é feita aqui, e não pela lista "xcb;wayland": num CachyOS/KDE essa lista acabou no Wayland nativo.
+if os.environ.get("XDG_SESSION_TYPE") == "wayland":
+    os.environ.setdefault("QT_QPA_PLATFORM", "xcb" if os.environ.get("DISPLAY") else "wayland")
 
 from PySide6.QtCore import QDir, QLockFile, QTimer
 from PySide6.QtWidgets import QApplication, QDialog, QMessageBox
@@ -67,6 +73,14 @@ def main():
     paths = Paths()
     log_module.setup(paths.log)
     log_module.capturar_erros()
+    log_module.log(f"[qt] plataforma: {app.platformName()}")   # xcb = XWayland; wayland = o pet não consegue se mover
+    if app.platformName() == "wayland":
+        # no Wayland nativo a janela não escolhe a própria posição: o pet ficaria parado no meio da tela
+        QMessageBox.critical(None, config.APP_NOME,
+                             f"O {config.APP_NOME} precisa do XWayland para andar pela tela no Wayland.\n\n"
+                             "Instale o XWayland (no Arch e no CachyOS: xorg-xwayland) e abra de novo. "
+                             "Se você definiu QT_QPA_PLATFORM=wayland, abra sem essa variável.")
+        return 1
     trava = travar_instancia(paths)
     if trava is None:
         QMessageBox.information(None, config.APP_NOME, f"O {config.APP_NOME} já está aberto. Procure o ícone na bandeja.")

@@ -5,6 +5,7 @@ janelas do Quartz) são testadas com saídas de exemplo, em qualquer sistema.
 Não há Mac nem Linux nos testes automatizados: o caminho real desses sistemas ainda precisa ser
 testado numa máquina de verdade (ver README).
 """
+import os
 import sys
 from pathlib import Path
 
@@ -21,6 +22,9 @@ from pestinha.sense.senses import detect_activity  # noqa: E402
 # Isso evita carregar pywin32 no macOS e QuickMacHotKey no Windows/Linux.
 macos = None
 windows = None
+kwin = None
+if sys.platform.startswith("linux"):
+    from pestinha.plataforma import kwin  # noqa: E402  (QtDBus)
 if sys.platform == "darwin":
     from pestinha.plataforma import macos  # noqa: E402
 elif sys.platform == "win32":
@@ -31,7 +35,7 @@ FUNCOES = ["ocioso_segundos", "processo_ativo", "retangulo_ativo", "tela_cheia",
 
 
 def test_cada_sistema_expoe_as_mesmas_funcoes():
-    modulos = [linux]
+    modulos = [linux] + ([kwin] if kwin is not None else [])
     if macos is not None:
         modulos.append(macos)
     if windows is not None:
@@ -43,7 +47,9 @@ def test_cada_sistema_expoe_as_mesmas_funcoes():
 
 
 def test_a_plataforma_escolhida_e_a_do_sistema_atual():
-    esperado = {"win32": windows, "darwin": macos}.get(sys.platform, linux)
+    kde_wayland = (os.environ.get("XDG_SESSION_TYPE") == "wayland"
+                   and "KDE" in os.environ.get("XDG_CURRENT_DESKTOP", ""))
+    esperado = {"win32": windows, "darwin": macos}.get(sys.platform, kwin if kde_wayland else linux)
     assert plataforma._backend is esperado
 
 
@@ -155,3 +161,51 @@ def test_atividade_reconhece_nomes_de_todos_os_sistemas():
     assert detect_activity("Spotify", 0.0, 300.0) == "MUSIC"
     assert detect_activity("programa-desconhecido", 0.0, 300.0) == "IDLE"
     assert detect_activity("code", 400.0, 300.0) == "AWAY"
+
+
+@pytest.mark.skipif(kwin is None, reason="Requer Linux (QtDBus)")
+def test_ponte_do_kwin_le_janelas_e_ativa():
+    texto = ('{"janelas": [{"id": "{a}", "pid": 10, "x": 0, "y": 0, "w": 800, "h": 600, "max": true,'
+             ' "caption": "Senha do banco"}], "ativa": {"id": "{a}", "pid": 10, "x": 0, "y": 0, "w": 800,'
+             ' "h": 600, "cheia": true}}')
+    janelas, ativa = kwin.parse_estado(texto)
+    assert janelas == [{"id": "{a}", "pid": 10, "ret": (0.0, 0.0, 800.0, 600.0), "max": True, "cheia": False}]
+    assert ativa["cheia"] is True and ativa["pid"] == 10
+    assert "Senha" not in repr(janelas)                 # título nunca é guardado
+
+
+@pytest.mark.skipif(kwin is None, reason="Requer Linux (QtDBus)")
+def test_ponte_do_kwin_descarta_o_que_vier_malformado():
+    assert kwin.parse_estado(None) == ([], None)
+    assert kwin.parse_estado("não é json") == ([], None)
+    assert kwin.parse_estado("[1, 2]") == ([], None)
+    ruins = ('{"janelas": [{"pid": 1, "x": NaN, "y": 0, "w": 9, "h": 9}, {"pid": "x"}, 7, "a",'
+             ' {"pid": 1, "x": 0, "y": 0, "w": -5, "h": 9}], "ativa": 3}')
+    assert kwin.parse_estado(ruins) == ([], None)
+    assert kwin.parse_cursor("[10, 20.5]") == (10.0, 20.5)
+    assert kwin.parse_cursor("[Infinity, 1]") is None
+    assert kwin.parse_cursor('"oi"') is None
+
+
+@pytest.mark.skipif(kwin is None, reason="Requer Linux (QtDBus)")
+def test_tempo_ocioso_do_wayland_soma_o_limiar():
+    assert kwin.segundos_ocioso(None, 100.0) == 0.0
+    assert kwin.segundos_ocioso(40.0, 100.0) == 60.0 + kwin.LIMIAR_OCIOSO
+
+
+def test_no_wayland_nativo_o_app_avisa_e_nao_abre(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    from PySide6.QtWidgets import QApplication
+    from pestinha.paths import Paths
+    QApplication.instance() or QApplication([])      # face_icon() precisa de um app de verdade
+    import main as main_mod
+    avisos, abriu = [], []
+    monkeypatch.setattr(main_mod, "QApplication", lambda argv: SimpleNamespace(
+        setQuitOnLastWindowClosed=lambda v: None, setWindowIcon=lambda i: None, exec=lambda: 0,
+        platformName=lambda: "wayland"))
+    monkeypatch.setattr(main_mod, "Paths", lambda: Paths(root=tmp_path))
+    monkeypatch.setattr(main_mod.QMessageBox, "critical", lambda *a: avisos.append(a[2]))
+    monkeypatch.setattr(main_mod, "PestinhaApp", lambda *a: abriu.append(True))
+    monkeypatch.setattr(sys, "argv", ["main.py", "--direto"])
+    assert main_mod.main() == 1
+    assert abriu == [] and "XWayland" in avisos[0]
