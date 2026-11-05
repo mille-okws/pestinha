@@ -68,6 +68,7 @@ class PetWindow(QWidget):
         """Janela transparente do pet: o rosto é desenhado aqui e o mouse vira gestos (cutucar, arrastar, arremessar)."""
         super().__init__(None, overlay_flags())
         self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
         self.setFixedSize(WIN, WIN)
 
