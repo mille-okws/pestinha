@@ -24,6 +24,7 @@ from ..mathutil import valor_real
 from ..store import read_json, write_json
 from ..world.arrastavel import FloatingWidget
 from ..world.cartazes import SignThing
+from ..body.pet import raise_without_activating
 
 TEXTO_PLAQUINHA = "CANTINHO\nDO CASTIGO"
 PLAQUINHA_W, PLAQUINHA_H = 190, 150     # placa com as pernas
@@ -287,7 +288,7 @@ class CastigoController:
         perto = math.hypot(cursor[0] - body.x, cursor[1] - body.y) < RAIO_VISITA
         self.visita += ((1.0 if perto else 0.0) - self.visita) * min(1.0, dt / TAU_VISITA)
         if now - self.ultimo_topo >= INTERVALO_TOPO:   # ele fica na frente da placa
-            self.app.pet.raise_()
+            raise_without_activating(self.app.pet)
             self.ultimo_topo = now
         self._posicionar_cartaz(body)
         if not asleep:                                 # dormindo, ele não cola cartaz nem foge

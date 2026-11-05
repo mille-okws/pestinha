@@ -116,14 +116,16 @@ FELIZ_APOS_CARINHO = 1.5        # s com os olhinhos fechados de felicidade depoi
 # DECISÕES PELA REDE: cada uma é um neurônio motor. O limiar é a taxa de disparo
 # (Hz) dele; a frequência de uma travessura ou de uma bolinha é a taxa vezes o ganho.
 # ---------------------------------------------------------------------------
-LIMIAR_SENTAR_HZ = 6.0          # SENTAR acima disso: senta
-LIMIAR_LEVANTAR_HZ = 3.0        # SENTAR abaixo disso: levanta (histerese)
-LIMIAR_FUGA_HZ = 2.0            # FUGIR acima disso enche a vontade de fugir; abaixo, ela vaza
-CARGA_FUGA_HZ_S = 300.0         # Hz·s acima do limiar para a vontade encher (bravo: ~30 s; entediado: ~50 s)
-LIMIAR_CANTO_HZ = 3.0           # CANTO acima disso: vai para o cantinho
-GANHO_TRAVESSURA = 0.002        # travessuras por segundo, por Hz do motor TRAVESSURA
-GANHO_CARTAZ = 0.5              # cartazes por segundo, por Hz do motor CARTAZ
-GANHO_PAPEL = 0.05              # bolinhas de papel por segundo, por Hz do motor PAPEL
+LIMIAR_SENTAR_HZ = 6.0                   # SENTAR acima disso: senta
+LIMIAR_LEVANTAR_HZ = 3.0                 # SENTAR abaixo disso: levanta (histerese)
+LIMIAR_FUGA_HZ = 2.0                     # FUGIR acima disso enche a vontade de fugir; abaixo, ela vaza
+CARGA_FUGA_HZ_S = 300.0                  # Hz·s acima do limiar para a vontade encher (bravo: ~30 s; entediado: ~50 s)
+LIMIAR_CANTO_HZ = 3.0                    # CANTO acima disso: vai para o cantinho
+GANHO_TRAVESSURA = 0.002                 # travessuras por segundo, por Hz do motor TRAVESSURA
+INTERVALO_COMENTARIO_S = 90.0            # mínimo entre comentários de IDE/notebook (se o pet tiver frases)
+INTERVALO_COMENTARIO_NOTEBOOK_S = 120.0  # comentários enquanto ele continua sentado
+GANHO_CARTAZ = 0.5                       # cartazes por segundo, por Hz do motor CARTAZ
+GANHO_PAPEL = 0.05                       # bolinhas de papel por segundo, por Hz do motor PAPEL
 
 # ---------------------------------------------------------------------------
 # Rosto e janela
@@ -205,6 +207,8 @@ _LIMITES = {
     "CARGA_FUGA_HZ_S": (float, 0.1, 10000.0),
     "LIMIAR_CANTO_HZ": (float, 0.0, 200.0),
     "GANHO_TRAVESSURA": (float, 0.0, 1.0),
+    "INTERVALO_COMENTARIO_S": (float, 1.0, 3600.0),
+    "INTERVALO_COMENTARIO_NOTEBOOK_S": (float, 1.0, 3600.0),
     "GANHO_CARTAZ": (float, 0.0, 1.0),
     "GANHO_PAPEL": (float, 0.0, 1.0),
     "LADO_JANELA_PET": (int, 100, 1000),

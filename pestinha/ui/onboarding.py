@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..config import APP_NOME
+from ..config import APP_NOME, PANIC_HOTKEY_TEXT
 from .ui import STYLE, face_icon
 
 DEV_NOTICE = (
@@ -40,7 +40,7 @@ PAGES = [
     ("Agora você escolhe",
      "Na próxima tela você decide o que eu posso fazer: travessuras, bolinha, carinho e "
      "mais. Tudo pode ser mudado depois, pelo menu da bandeja ou pelo botão direito em mim.\n\n"
-     "Atalho de pânico: Ctrl + Alt + Shift + B desliga tudo na hora."),
+     f"Atalho de pânico: {PANIC_HOTKEY_TEXT} desliga tudo na hora."),
 ]
 
 

@@ -1,0 +1,8 @@
+Deixa que eu arrumo esse seu código ruim...
+Calma. Eu também tô procurando o ponto e vírgula.
+Tô trabalhando. Olhar pro erro também conta.
+Aqui na minha máquina imaginária funciona.
+Vou refatorar. Se piorar, a gente chama de versão 2.
+Pair programming: você digita, eu julgo.
+Meu PR tem duas linhas e três dias de história.
+Já corrigi. Agora é outro erro.

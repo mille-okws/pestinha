@@ -147,6 +147,18 @@ class ConteudoPaths:
         """Bilhetes que ele cola quando está triste."""
         return self.resolver("recadinhos_tristes.txt")
 
+    def comentarios(self, contexto):
+        """Frases opcionais para entrar na IDE ou trabalhar no notebook."""
+        if contexto not in ("ide", "notebook"):
+            raise ValueError(f"contexto de comentário inválido: {contexto!r}")
+        return self.resolver(f"recadinhos_{contexto}.txt")
+
+    def memes_contexto(self, contexto):
+        """Memes dos comentários: trabalhando/ para IDE e notebook/ para o pet sentado."""
+        if contexto not in ("ide", "notebook"):
+            raise ValueError(f"contexto de comentário inválido: {contexto!r}")
+        return self.resolver("memes/trabalhando" if contexto == "ide" else "memes/notebook")
+
     @property
     def signs(self):
         """cartazes.txt: frases dos cartazes de protesto, por seção."""

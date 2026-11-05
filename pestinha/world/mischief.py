@@ -5,7 +5,8 @@ Regras fixas (não dependem do cérebro):
     - só com permissão, fora de tela cheia e abaixo do limite de objetos
     - um clique em qualquer lugar do objeto fecha ele (sempre)
     - nada nasce em cima do cursor
-O cérebro só decide QUANDO e com que emoção; aqui se decide a FORMA.
+O cérebro decide quando fazer as travessuras habituais; comentários de IDE/notebook
+usam regras de contexto no controlador. Aqui se decide a forma das duas coisas.
 """
 
 import math
@@ -33,6 +34,34 @@ class MischiefEngine(QObject):
         self.paths = conteudo                                 # ConteudoPaths: só o conteúdo deste pet e o comum
         self.notes = config.Notes(conteudo.notes)
         self.notes_sad = config.Notes(conteudo.notes_sad)       # bilhetes de quando ele está triste
+        self.comments = {ctx: config.Notes(conteudo.comentarios(ctx)) for ctx in ("ide", "notebook")}
+        self.last_comment_image = {}
+
+    def comment(self, contexto, perms):
+        """Monta uma piada contextual; o arquivo de frases é a adesão opcional do personagem."""
+        notes = self.comments[contexto]
+        if not notes.has_lines():
+            return None                         # pets antigos mantêm o comportamento
+        images = config.list_images(self.paths.memes_contexto(contexto)) if perms["memes"] else []
+        options = (["meme"] if images else []) + (["bilhete"] if perms["bilhetes"] else [])
+        if not options:
+            return None
+        action = random.choice(options)
+        if action == "meme":
+            candidates = [p for p in images if p != self.last_comment_image.get(contexto)] or images
+            path = random.choice(candidates)
+            thing = ImageThing(path, MEME_MAX)
+            if not thing.valida:
+                thing.deleteLater()
+                return None
+            self.last_comment_image[contexto] = path
+        else:
+            text = notes.pick()
+            if not text:
+                return None
+            thing = NoteThing(text)
+        thing.clicked.connect(self._on_click)
+        return action, thing
 
     # ---------------- agenda ----------------
 

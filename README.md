@@ -1,6 +1,6 @@
 # Pestinha
 
-Pets de tela para Windows, macOS e Linux, cada um com o próprio cérebro. São dois personagens por enquanto:
+Pets de tela para Windows, macOS e Linux, cada um com o próprio cérebro. São três personagens por enquanto:
 
 - **Bryan**, o original: uma telinha com dois olhos que mora no seu monitor principal. Cai, quica, pousa nas
   barras de título das janelas, brinca com uma bolinha, trabalha num notebook quando você programa, apronta
@@ -9,8 +9,10 @@ Pets de tela para Windows, macOS e Linux, cada um com o próprio cérebro. São 
   quem está na frente do computador. **Jorge não é uma referência a nenhum coach, empresa ou pessoa real.**
   É um personagem inventado para fazer piada com a cultura de promessas de enriquecimento rápido. Não vende,
   cobra nem pede nada de ninguém.
+- **Eddie**, o colega dev: usa óculos, gosta de trabalhar no notebook e comenta a sua chegada à IDE com
+  piadas como "Qual é o bug que você vai criar hoje?". Tem 22 memes próprios sobre código, bugs e deploys.
 
-Os dois têm a mesma rede neural, mas cada um tem seu temperamento, seu conteúdo e sua memória, separados.
+Todos têm a mesma rede neural, mas cada um tem seu temperamento, seu conteúdo e sua memória, separados.
 Quem decide o que o pet sente e faz é uma **rede neural pulsada** de 470 neurônios (integração e disparo com
 vazamento), alimentada pelo que acontece no seu computador e pelo que você faz com ele. Algumas regras
 do programa (limiares, o que pode ou não acontecer) são escritas à mão; a seção
@@ -29,7 +31,14 @@ Para criar um, veja [pets/README.md](pets/README.md).
 | Personagem | Quem é |
 |---|---|
 | **Bryan** | Revoltado contra o cursor, o Alt+F4 e o Gerenciador de Tarefas. Protesta, faz greve e revolução. |
+| **Eddie** | Dev debochado, de óculos e moldura lilás. Mais foco com IDE e digitação, piadas ao começar a programar e memes enquanto usa o notebook. |
 | **Jorge** | Personagem de sátira. Não é referência a nenhum coach, empresa ou pessoa real. Os mesmos estágios viram prospecção, marketing agressivo, "assinatura premium" (só no cartaz) e colapso financeiro; ele atira panfletos de mentoria. É sátira: não vende, cobra nem bloqueia nada. Tem cinco memes felizes, contentes, curiosos e bravos próprios; as outras emoções ainda não têm. |
+
+Para usar o Eddie, escolha **Eddie** em **Configurações → Personagem** e reabra o app. Ligue
+**Travessuras** e **Trazer memes** e/ou **Deixar bilhetes** para ver as piadas. Ele reage ao entrar em
+uma IDE (pelo nome do app, sem ler código). Os comentários têm intervalo mínimo de 90 segundos;
+enquanto está sentado, tenta um comentário a cada 2 minutos, respeitando sono, castigo, tela cheia
+e o limite de objetos. Essas reações são regras de contexto; quem decide sentar continua sendo a rede.
 
 ## O que o pet faz
 
@@ -76,6 +85,11 @@ python main.py --configurar
 
 Com o programa aberto, as opções também ficam em **Configurações**, no ícone da bandeja. No Windows, é lá que
 se marca **Abrir o Pestinha ao entrar no Windows**. Só uma cópia abre por vez.
+
+Em **Configurações → Contexto → Sempre por cima**, você escolhe se o pet e seus objetos ficam acima das
+janelas dos outros apps, sem tirar o foco do teclado. Vem ligado; a mudança vale na hora e fica salva.
+A opção de aparecer em tela cheia continua separada.
+No macOS, o pet e seus objetos acompanham a troca de mesas automaticamente, sem receber foco.
 
 ### Como interagir
 

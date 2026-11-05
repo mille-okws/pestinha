@@ -222,13 +222,15 @@ class SettingsDialog(QDialog):
         conteudo = self.paths.conteudo(pet)
         memes = sum(len(config.list_images(conteudo.memes / e)) for e in config.EMOTIONS)
         trabalho = len(config.list_images(conteudo.memes_trabalho))
+        notebook = len(config.list_images(conteudo.memes_contexto("notebook")))
+        no_notebook = f", {notebook} de notebook" if notebook else ""
         photos = len(config.list_images(conteudo.fotos))
         notes = config.Notes(conteudo.notes)
         notes._reload()
         tristes = config.Notes(conteudo.notes_sad)
         tristes._reload()
         nome = config.load_pet(self.paths, pet)["nome"]
-        self.resumo.setText(f"Conteúdo de {nome}: {memes} memes de emoção, {trabalho} de trabalho, {photos} fotos, "
+        self.resumo.setText(f"Conteúdo de {nome}: {memes} memes de emoção, {trabalho} de trabalho{no_notebook}, {photos} fotos, "
                             f"{len(notes.lines)} recadinhos e {len(tristes.lines)} bilhetes tristes.")
 
     def _update_history_label(self):

@@ -13,6 +13,7 @@ import time
 from PySide6.QtWidgets import QApplication, QMessageBox, QSystemTrayIcon
 from .. import config, store
 from ..ui.ui import SettingsDialog
+from ..body.pet import set_always_on_top
 
 
 class SessaoMixin:
@@ -33,6 +34,7 @@ class SessaoMixin:
 
     def _apply_settings(self):
         """Aplica as permissões atuais: o que mostrar, quais painéis e o estado do pet."""
+        set_always_on_top(self.perms["sempre_por_cima"])
         st = self.pet_state
         st.show_label = self.perms["modo_teste"] and self.perms["mostrar_emocao"]
         st.allow_drag = self.perms["arrastar"]

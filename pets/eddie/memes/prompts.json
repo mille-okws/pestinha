@@ -1,0 +1,228 @@
+{
+  "generator": "image_gen (ferramenta integrada)",
+  "estilo": "Pixel art de personagem em cena, títulos grandes; identidade lilás e verde-menta do Eddie.",
+  "assets": [
+    {
+      "arquivo": "trabalhando/eddie_01.png",
+      "setup": "IDE aberta.",
+      "punchline": "Qual é o bug que você vai criar hoje?",
+      "emocao": "curioso",
+      "prompt": "Use case: style-transfer. Redesign an Eddie developer meme to match the other existing pet memes. Image 1 is the edit target; preserve its two exact Portuguese phrases, the character's lilac rim, mint eyes, dark screen body and glasses. Image 2 and 3 are composition and pixel-art style references ONLY, not text or character identity.\nCreate one square polished pixel-art meme illustration filling the entire canvas, no rounded UI card, no watermark, no terminal title bar. Like the references: big chunky high-contrast pixel lettering at top, large expressive screen-shaped character in the bottom two thirds, a humorous dev desk scene, crisp pixel edges. Eddie is a cute dark monitor-shaped pet with lilac border, mint green expressive eyes behind rectangular glasses, small pixel arms, no human head, no tie. Foreground Eddie sitting at a laptop, leaning forward with a mischievous curious look and offering the keyboard to the viewer, coffee and a few tiny pixel bug icons. Palette charcoal, lilac, mint green, white.\nExact text to preserve (case may be uppercase as references): top setup \"IDE aberta.\" and prominent punchline \"Qual é o bug que você vai criar hoje?\" Spell Portuguese accents correctly. Both phrases must be large and readable at 230px thumbnail size. Put all text in upper third, illustrative scene below. Do not add extra wording.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (cartão original substituído)",
+        "pets/bryan/memes/trabalhando/trabalho_21.webp",
+        "pets/jorge/memes/curioso/jorge_curioso_01.webp"
+      ]
+    },
+    {
+      "arquivo": "trabalhando/eddie_02.png",
+      "setup": "Só uma alteração pequena.",
+      "punchline": "Últimas palavras antes do incidente.",
+      "emocao": "assustado",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Eddie recoils, wide startled mint eyes behind glasses, one finger hovering over a key; laptop screen full of red error symbols, mug tipping slightly.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Só uma alteração pequena.\"\nPunchline: \"Últimas palavras antes do incidente.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "trabalhando/eddie_03.png",
+      "setup": "Você: vou só renomear.",
+      "punchline": "Git: 47 arquivos alterados.",
+      "emocao": "dramatico",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Eddie aghast in front of an overflowing stack of file icons, one tiny renamed folder turning into a mountain of changes; dramatic dev desk scene.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Você: vou só renomear.\"\nPunchline: \"Git: 47 arquivos alterados.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "trabalhando/eddie_04.png",
+      "setup": "Debugger ligado.",
+      "punchline": "O bug: nunca nem estive aqui.",
+      "emocao": "observando",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Eddie peers suspiciously through a magnifying glass at an empty debugger window; a tiny pixel bug sneaks behind his laptop.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Debugger ligado.\"\nPunchline: \"O bug: nunca nem estive aqui.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "trabalhando/eddie_05.png",
+      "setup": "Bom dia, dev.",
+      "punchline": "Já tomou café ou vai codar no ódio?",
+      "emocao": "contente",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Relaxed Eddie holding a steaming mug beside an open laptop, tousled stack of notes, cozy late-night coding desk.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Bom dia, dev.\"\nPunchline: \"Já tomou café ou vai codar no ódio?\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "trabalhando/eddie_06.png",
+      "setup": "Abriu outra aba.",
+      "punchline": "Agora são 12 soluções e nenhuma funciona.",
+      "emocao": "curioso",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Curious Eddie surrounded by a comically sprawling fan of browser tabs above his laptop, confused mint eyes; several competing diagrams.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Abriu outra aba.\"\nPunchline: \"Agora são 12 soluções e nenhuma funciona.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "notebook/eddie_01.png",
+      "setup": "Licença, chegou o sênior.",
+      "punchline": "Deixa que eu arrumo esse seu código ruim...",
+      "emocao": "contente",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Confident Eddie leans over a laptop rolling up his tiny pixel sleeves, one hand on the keyboard, smirking eyes behind lilac rectangular glasses.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Licença, chegou o sênior.\"\nPunchline: \"Deixa que eu arrumo esse seu código ruim...\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "notebook/eddie_02.png",
+      "setup": "Pair programming.",
+      "punchline": "Você digita. Eu julgo.",
+      "emocao": "observando",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Eddie at a laptop, judging the viewer over his glasses with unimpressed mint eyes; coffee and a neat coding notebook.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Pair programming.\"\nPunchline: \"Você digita. Eu julgo.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "notebook/eddie_03.png",
+      "setup": "Já corrigi o erro.",
+      "punchline": "Agora temos um erro novo.",
+      "emocao": "feliz",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Happy Eddie proudly points at a green check on one screen while a fresh red error symbol pops up on another screen behind him.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Já corrigi o erro.\"\nPunchline: \"Agora temos um erro novo.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "notebook/eddie_04.png",
+      "setup": "Não me interrompe.",
+      "punchline": "Tô encarando o código até ele confessar.",
+      "emocao": "bravo",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Annoyed determined Eddie leans very close to the laptop screen as if interrogating it, arms folded, steaming coffee untouched.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Não me interrompe.\"\nPunchline: \"Tô encarando o código até ele confessar.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "feliz/eddie_01.png",
+      "setup": "O build passou!",
+      "punchline": "Ninguém encosta em nada.",
+      "emocao": "feliz",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Overjoyed Eddie celebrating a green build check, arms raised, mint pixel confetti; laptop and keyboard at desk.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"O build passou!\"\nPunchline: \"Ninguém encosta em nada.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "feliz/eddie_02.png",
+      "setup": "Resolvi o bug.",
+      "punchline": "Não sei como. Mas resolvi.",
+      "emocao": "feliz",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Joyful but puzzled Eddie gives a sheepish thumbs up, laptop shows a green check, tangled leads and notes nearby.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Resolvi o bug.\"\nPunchline: \"Não sei como. Mas resolvi.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "contente/eddie_01.png",
+      "setup": "Na minha máquina funciona.",
+      "punchline": "Vamos entregar a minha máquina.",
+      "emocao": "contente",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Smug Eddie presents his laptop like a precious package for shipping, a cardboard box and cable on the desk.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Na minha máquina funciona.\"\nPunchline: \"Vamos entregar a minha máquina.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "contente/eddie_02.png",
+      "setup": "Code review aprovado.",
+      "punchline": "Até desconfiei de mim.",
+      "emocao": "contente",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Content Eddie looks surprised at an approved review checkmark, hand to his glasses, relieved coding workspace.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Code review aprovado.\"\nPunchline: \"Até desconfiei de mim.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "curioso/eddie_01.png",
+      "setup": "Quem escreveu isso?",
+      "punchline": "Git blame: eu. Ontem.",
+      "emocao": "curioso",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Curious Eddie pointing at himself with embarrassed mint eyes, laptop showing an abstract author-avatar icon and a branching line.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Quem escreveu isso?\"\nPunchline: \"Git blame: eu. Ontem.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "curioso/eddie_02.png",
+      "setup": "E se eu tirar esse if?",
+      "punchline": "O início de toda tragédia.",
+      "emocao": "curioso",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Curious mischievous Eddie about to pull one block out of a precarious tower of code blocks; laptop nearby.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"E se eu tirar esse if?\"\nPunchline: \"O início de toda tragédia.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "observando/eddie_01.png",
+      "setup": "TODO: arrumar depois.",
+      "punchline": "O depois já tem 3 anos.",
+      "emocao": "observando",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Eddie calmly watches a dusty sticky-note pile and a tiny cobweb at the corner of the laptop; old task calendar in background, no readable added text.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"TODO: arrumar depois.\"\nPunchline: \"O depois já tem 3 anos.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "bravo/eddie_01.png",
+      "setup": "Não é o cache.",
+      "punchline": "Era o cache.",
+      "emocao": "bravo",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Angry Eddie glaring at a stack of cache boxes on his laptop, dramatic frustrated eyebrows, purple and mint light.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Não é o cache.\"\nPunchline: \"Era o cache.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "bravo/eddie_02.png",
+      "setup": "Só faltava um ponto e vírgula.",
+      "punchline": "Três horas da minha vida.",
+      "emocao": "bravo",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Exasperated Eddie holds a giant tiny semicolon symbol between his pixel fingers, clock and empty mugs behind laptop.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Só faltava um ponto e vírgula.\"\nPunchline: \"Três horas da minha vida.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "triste/eddie_01.png",
+      "setup": "PR em draft.",
+      "punchline": "Igual à minha vontade de sair da cama.",
+      "emocao": "triste",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Sad Eddie wrapped in a blanket at his coding desk, head on folded arms, dim laptop showing a draft pencil icon.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"PR em draft.\"\nPunchline: \"Igual à minha vontade de sair da cama.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "assustado/eddie_01.png",
+      "setup": "Deploy na sexta.",
+      "punchline": "O fim de semana pediu demissão.",
+      "emocao": "assustado",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Terrified Eddie staring at a looming deployment rocket next to his laptop, alarm lights and a discarded weekend calendar.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Deploy na sexta.\"\nPunchline: \"O fim de semana pediu demissão.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    },
+    {
+      "arquivo": "dramatico/eddie_01.png",
+      "setup": "Apaguei um console.log.",
+      "punchline": "Parou de funcionar.",
+      "emocao": "dramatico",
+      "prompt": "Use case: illustration-story. Create ONE square pixel-art meme for the Eddie developer pet. Attached image is the visual style, character identity and composition reference ONLY; replace its words and scene with the specification below.\nMatch its chunky crisp pixel-art aesthetic, charcoal background, lilac outlines, mint green lighting, large expressive monitor-shaped mascot with lilac rectangular glasses, mint eyes, tiny pixel arms, NO human face and NO tie. Fill the canvas with an illustrated dev scene. All caption text is large, chunky high-contrast white/mint pixel lettering with black outlines in the upper third; character and scene occupy lower two thirds. No rounded UI card, no smooth flat vector card, no watermark, no extra wording. Readable as a 230px meme thumbnail. Same exact Eddie identity as reference.\nScene: Dramatic Eddie with hands on head as the laptop bursts into abstract error symbols, an erased log line represented by fading blocks.\nPreserve these exact Portuguese phrases and accents (uppercase styling allowed):\nSetup: \"Apaguei um console.log.\"\nPunchline: \"Parou de funcionar.\"\nKeep setup smaller than punchline, but both very readable. Do not copy the reference's caption. One finished meme image, not a grid.",
+      "referencias": [
+        "pets/eddie/memes/trabalhando/eddie_01.png (nova versão pixel art)"
+      ]
+    }
+  ]
+}

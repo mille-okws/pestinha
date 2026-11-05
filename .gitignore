@@ -8,6 +8,7 @@ __pycache__/
 build/
 dist/
 *.spec
+.idea/
 instalador/saida/
 
 # Temporários
@@ -15,3 +16,4 @@ instalador/saida/
 *.corrompido
 *.log
 scratch_*.py
+tmp/

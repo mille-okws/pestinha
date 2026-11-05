@@ -6,6 +6,7 @@ e é gravado a CADA mudança (se o programa cair, a escolha não se perde).
 """
 
 import random
+import sys
 
 from .paths import pet_id_valido
 from .store import read_json, read_lines, write_json
@@ -26,7 +27,7 @@ EMOTION_NAMES = {
 
 IMAGE_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"}
 
-PANIC_HOTKEY_TEXT = "Ctrl + Alt + Shift + B"
+PANIC_HOTKEY_TEXT = "⌃ ⌥ ⇧ B" if sys.platform == "darwin" else "Ctrl + Alt + Shift + B"
 
 # ============================================================
 # PERMISSÕES
@@ -44,6 +45,7 @@ DEFAULT_PERMISSIONS = {
     "carinho": True,           # esfregar o mouse nele = carinho, e ele aprende com isso
     "arrastar": True,
     "pousar_janelas": True,
+    "sempre_por_cima": True,   # pet e objetos acima das janelas comuns, sem receber foco
     "tela_cheia": False,       # experimental: aparecer em jogo/vídeo/apresentação
     "rotina": False,           # grava a timeline por minuto (só categorias); nada usa esses dados ainda
     "modo_teste": False,       # desligado por padrão: o modo teste é só para desenvolvimento
@@ -69,6 +71,8 @@ PERMISSION_GROUPS = [
         ("pousar_janelas", "Pousar em janelas", "Solto no ar, ele pode cair em cima da barra de título."),
     ]),
     ("Contexto", [
+        ("sempre_por_cima", "Sempre por cima",
+         "Mantém o pet e seus objetos acima das janelas dos outros apps, sem tirar o foco. Vale na hora."),
         ("tela_cheia", "Aparecer em tela cheia (experimental)",
          "Por padrão ele some em jogos, vídeos e apresentações."),
     ]),

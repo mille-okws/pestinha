@@ -5,6 +5,7 @@ As regras dizem o que PODE (permissões, tela cheia, limite de objetos, assets,
 triste e dormindo não aprontam). A memória episódica escolhe o que FAZER,
 pelo que deu certo antes naquele contexto. A dispensa alimenta a rede (raiva),
 a memória (episódio negativo) e o aprendizado (penalidade de 1 s).
+Comentários opcionais de IDE/notebook usam eventos e intervalos fixos, com as mesmas permissões.
 """
 
 from ..log import log
@@ -15,7 +16,7 @@ VALIDADE_PEDIDO_S = 10.0    # s: "fazer uma travessura agora" vale por este temp
 
 from ..core.emotion import PRIORITY
 from ..ajustes import (DISPENSA_RAPIDA as QUICK_DISMISS, PENALIDADE_DISPENSA as PENALTY_SECONDS,
-                       GANHO_TRAVESSURA)
+                       GANHO_TRAVESSURA, INTERVALO_COMENTARIO_S, INTERVALO_COMENTARIO_NOTEBOOK_S)
 
 
 
@@ -35,6 +36,40 @@ class MischiefController:
         self.penalty_until = 0.0
         self.pedido_forcado = False     # "fazer uma travessura agora": ignora o sorteio uma vez
         self.forcado_ate = 0.0
+        self._comentario_atividade = None
+        self._comentario_programa = None
+        self._comentario_sentado = False
+        self._proximo_comentario = 0.0
+        self._proximo_comentario_notebook = 0.0
+
+    def maybe_comment(self, now, bounds, cursor, *, activity, emotion, seated, perms, prof,
+                      fullscreen, blocked=False, program=None):
+        """Piadas opcionais por contexto, com intervalo fixo; não dependem do sorteio neural."""
+        entrou_ide = activity == "PROGRAMMING" and (
+            self._comentario_atividade != "PROGRAMMING" or program != self._comentario_programa)
+        sentou = seated and not self._comentario_sentado
+        self._comentario_atividade, self._comentario_sentado = activity, seated
+        self._comentario_programa = program
+        notebook = seated and (sentou or now >= self._proximo_comentario_notebook)
+        if notebook:
+            self._proximo_comentario_notebook = now + INTERVALO_COMENTARIO_NOTEBOOK_S
+        if not entrou_ide and not notebook:
+            return None
+        # Um evento bloqueado é descartado: nada de fila de piadas ao voltar ou religar.
+        if (blocked or emotion in ("triste", "dormindo") or self.penalty_active(now)
+                or now < self._proximo_comentario or not self.engine.allowed(perms, prof, fullscreen)):
+            return None
+        contexto = "ide" if entrou_ide else "notebook"
+        result = self.engine.comment(contexto, perms)
+        if result is None:
+            return None
+        action, thing = result
+        if not self.engine.show_in_corner(thing, bounds, cursor):
+            return None
+        self._proximo_comentario = now + INTERVALO_COMENTARIO_S
+        self.memory.start(self.memory.context(activity, emotion), action, thing)
+        self.drives.stimulate("mischief")
+        return action
 
     def pedir(self, now):
         """O comando do menu: a próxima tentativa acontece, se as regras permitirem, nos próximos segundos."""

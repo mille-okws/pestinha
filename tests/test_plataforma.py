@@ -7,6 +7,7 @@ testado numa máquina de verdade (ver README).
 """
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -81,6 +82,29 @@ def test_ioreg_converte_nanossegundos():
     assert macos is not None
     assert macos.ocioso_do_ioreg(texto) == 2.5
     assert macos.ocioso_do_ioreg("sem a chave") == 0.0
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="Requer backend macOS")
+@pytest.mark.parametrize("nome,bundle,esperado", [
+    ("ChatGPT", "com.openai.codex", "codex"),
+    ("Codex", "com.openai.codex", "codex"),
+    ("ChatGPT", "com.openai.chat", "chatgpt"),
+    ("WebStorm", None, "webstorm"),
+])
+def test_programa_ativo_mac_identifica_codex_pelo_bundle(monkeypatch, nome, bundle, esperado):
+    assert macos is not None
+    app = SimpleNamespace(localizedName=lambda: nome, bundleIdentifier=lambda: bundle)
+    monkeypatch.setattr(macos, "_programa_da_frente", lambda: app)
+    assert macos.processo_ativo() == esperado
+    if esperado == "codex":
+        assert detect_activity(macos.processo_ativo(), 0.0, 300.0) == "PROGRAMMING"
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="Requer backend macOS")
+def test_programa_ativo_mac_sem_aplicativo(monkeypatch):
+    assert macos is not None
+    monkeypatch.setattr(macos, "_programa_da_frente", lambda: None)
+    assert macos.processo_ativo() == "unknown"
 
 
 def _janela(pid, x, y, w, h, camada=0, janela_id=1):

@@ -34,6 +34,7 @@ class Ball(QWidget):
         super().__init__(None, overlay_flags())
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
         self.setFixedSize(RADIUS * 2 + 8, RADIUS * 2 + 8)
         self.body = Body(x, y, RADIUS, RADIUS)
         self.angle = 0.0

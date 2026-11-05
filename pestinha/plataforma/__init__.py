@@ -10,6 +10,8 @@ escolhe o certo na importação. Os retângulos são em pixels físicos (o app d
     tela_cheia()                 a janela em primeiro plano cobre o monitor inteiro
     janelas_visiveis(excluir, escala)   [(id, (l, t, r, b), maximizada)] de cima para baixo
     sem_foco_nativo(janela_id)   a janela do pet não rouba o foco (quando o sistema permite)
+    elevar_sem_foco(janela_id)   reordena nativamente; False pede o fallback Qt
+    definir_nivel_janela(janela_id, sempre_por_cima)   ajusta o nível nativo do overlay
     iniciar_atalho(callback)     Ctrl+Alt+Shift+B; devolve True se registrou
 
 Só no Windows, por enquanto (TEM_INICIO_AUTOMATICO diz se existe):
@@ -34,6 +36,8 @@ retangulo_ativo = _backend.retangulo_ativo
 tela_cheia = _backend.tela_cheia
 janelas_visiveis = _backend.janelas_visiveis
 sem_foco_nativo = _backend.sem_foco_nativo
+elevar_sem_foco = getattr(_backend, "elevar_sem_foco", lambda janela_id: False)
+definir_nivel_janela = getattr(_backend, "definir_nivel_janela", lambda janela_id, sempre_por_cima: None)
 iniciar_atalho = _backend.iniciar_atalho
 
 TEM_INICIO_AUTOMATICO = hasattr(_backend, "definir_inicio_com_sistema")

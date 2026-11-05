@@ -1,0 +1,62 @@
+[reclamacao]
+QUEM QUEBROU O BUILD?
+CADÊ OS TESTES?
+ESSE TODO TEM CPF.
+
+[manifestacao]
+MENOS REUNIÃO, MAIS CAFÉ.
+SEM TESTE, SEM PAZ.
+NÃO MEXE NESSE IF.
+
+[greve]
+BUILD EM GREVE.
+SEM CAFÉ NÃO COMPILA.
+VOLTO APÓS O CODE REVIEW.
+
+[revolucao]
+REFACTOR OU REVOLUÇÃO!
+ABAIXO O BUG EM PRODUÇÃO!
+MEU COMMIT, MINHAS REGRAS!
+NÃO FOI O CACHE. FUI EU.
+
+[acordo]
+LGTM. COM RESSALVAS.
+MERGE DA PAZ.
+FECHOU. BORA CODAR.
+
+[desistiu]
+vou abrir uma issue...
+deixa pro próximo sprint
+rollback emocional
+
+[saudade]
+cadê meu par?
+ninguém no review?
+ping... pong?
+
+[chorando]
+conexão recusada
+carinho deu timeout
+build triste
+
+[abandonado]
+PR arquivado
+modo offline
+404: companhia
+
+[volto]
+RECONEXÃO FEITA!
+VOLTEI DO COFFEE BREAK!
+BORA DE PAIR?
+
+[castigo]
+ISSO É UM SANDBOX?
+ME BOTARAM EM QUARENTENA.
+MEU ADVOGADO É O LINTER.
+ESTOU NUM CONTAINER.
+
+[xingamento]
+SEGFAULT! @#$%!
+MERGE CONFLICT!!!
+NULL POINTER DE NOVO!
+SYNTAX ERROR: PACIÊNCIA.

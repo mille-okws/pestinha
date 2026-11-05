@@ -43,8 +43,9 @@ class Corpo:
 
 
 @pytest.fixture
-def castigo(tmp_path):
+def castigo(tmp_path, monkeypatch):
     QApplication.instance() or QApplication([])
+    monkeypatch.setattr("pestinha.mind.castigo_ctl.raise_without_activating", lambda janela: janela.raise_())
     app = SimpleNamespace(paths=Paths(root=tmp_path), pet_paths=Paths(root=tmp_path).pet("bryan"),
                           pet=SimpleNamespace(raise_=lambda: None),
                           behavior=SimpleNamespace(fuga_alvo=None, walk_to=lambda x, v: None),

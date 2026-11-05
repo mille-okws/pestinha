@@ -555,6 +555,15 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
 
     def maybe_mischief(self, now, dt, bounds, cursor, motores):
         """Decide se vai aprontar uma travessura agora (não aprontar de castigo nem dormindo)."""
+        comment = self.mischief_ctl.maybe_comment(
+            now, bounds, cursor, activity=self.activity, emotion=self.pet_state.emotion,
+            seated=self.mesa.sentado, perms=self.perms, prof=self.prof, fullscreen=self.fullscreen,
+            program=self.tracker.app,
+            blocked=(self.castigo.dentro or self.asleep or self.protest.stage >= 3
+                     or self.pet.body.held or bool(self.behavior.mission)),
+        )
+        if comment:
+            return
         if self.castigo.dentro:                      # de castigo não apronta (e não deixa objeto solto)
             return
         self.mischief_ctl.maybe_act(

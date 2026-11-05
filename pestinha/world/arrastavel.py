@@ -12,7 +12,7 @@ from PySide6.QtCore import Qt, QRect
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget
 
-from ..body.pet import set_no_activate
+from ..body.pet import overlay_flags, set_no_activate
 from ..mathutil import valor_real
 from ..store import read_json, write_json
 
@@ -55,8 +55,9 @@ class FloatingWidget(QWidget):
     """Janela de painel que você pode arrastar, sempre por cima, sem roubar o foco."""
     def __init__(self, app, key, title, size, minimum, default_pos):
         """Cria o painel com título, tamanho (e tamanho mínimo) e a posição salva (ou a padrão)."""
-        super().__init__(None, Qt.FramelessWindowHint | Qt.Tool
-                         | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus)
+        super().__init__(None, overlay_flags())
+        self.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
         self.app = app
         self.key = key
         self.setWindowTitle(title)

@@ -63,6 +63,9 @@ def ocioso_segundos():
 def processo_ativo():
     """Nome do programa em primeiro plano, em minúsculo."""
     app = _programa_da_frente()
+    # Algumas versões do Codex se apresentam como ChatGPT no macOS.
+    if app is not None and app.bundleIdentifier() == "com.openai.codex":
+        return "codex"
     nome = app.localizedName() if app is not None else None
     return str(nome).lower() if nome else "unknown"
 
@@ -147,6 +150,46 @@ def janelas_visiveis(excluir, escala=1.0):
 
 def sem_foco_nativo(janela_id):
     """No macOS o pet já é uma janela sem foco (Qt.WA_ShowWithoutActivating); nada a fazer aqui."""
+
+
+def elevar_sem_foco(janela_id):
+    """Reordena o NSWindow sem ativar o processo, ao contrário de QWidget.raise_ no Cocoa."""
+    if QApplication.platformName() != "cocoa":
+        return False                       # winId offscreen não é um ponteiro NSView
+    import objc
+
+    view = objc.objc_object(c_void_p=janela_id)
+    window = view.window()
+    if window is not None and window.isVisible():
+        window.orderFrontRegardless()
+    return True
+
+
+def definir_nivel_janela(janela_id, sempre_por_cima):
+    """Mantém o overlay em todas as mesas, no nível escolhido, sem ativá-lo."""
+    if QApplication.platformName() != "cocoa":
+        return
+    import objc
+    from AppKit import (
+        NSModalPanelWindowLevel,
+        NSNormalWindowLevel,
+        NSWindowCollectionBehaviorCanJoinAllSpaces,
+        NSWindowCollectionBehaviorMoveToActiveSpace,
+    )
+
+    window = objc.objc_object(c_void_p=janela_id).window()
+    if window is not None:
+        window.setHidesOnDeactivate_(False)
+        # MoveToActiveSpace (padrão do Qt.Tool) depende de ativação; o pet nunca
+        # deve precisar de foco para acompanhar a mesa. As opções são exclusivas.
+        behavior = window.collectionBehavior()
+        behavior &= ~NSWindowCollectionBehaviorMoveToActiveSpace
+        behavior |= NSWindowCollectionBehaviorCanJoinAllSpaces
+        window.setCollectionBehavior_(behavior)
+        # O nível floating pode ser rebaixado pelo Qt ao perder a ativação.
+        # ModalPanel é o nível usado pelo próprio Qt para WindowStaysOnTopHint;
+        # ele não torna a janela modal nem lhe dá foco.
+        window.setLevel_(NSModalPanelWindowLevel if sempre_por_cima else NSNormalWindowLevel)
 
 
 def iniciar_atalho(callback):

@@ -15,7 +15,7 @@ from ..mathutil import clamp
 ACTIVITY_APPS = {
     "PROGRAMMING": {"code", "visual studio code", "devenv", "pycharm64", "pycharm", "xcode",
                     "claude", "codex", "cursor", "windsurf", "zed", "windowsterminal", "wt",
-                    "idea64", "idea", "webstorm64", "rider64", "clion64", "goland64", "phpstorm64",
+                    "idea64", "idea", "webstorm", "webstorm64", "rider64", "clion64", "goland64", "phpstorm64",
                     "sublime_text", "notepad++", "antigravity", "kiro", "trae", "studio64",
                     "android studio"},
     "DESIGNING": {"fusion360", "fusion", "blender", "figma", "photoshop", "adobe photoshop", "illustrator",
@@ -26,7 +26,7 @@ ACTIVITY_APPS = {
     "GAMING": {"valorant", "cs2", "csgo", "league of legends", "robloxplayerbeta", "roblox",
                "minecraft.windows", "minecraft", "fortniteclient-win64-shipping", "fortnite", "r5apex",
                "r5apex_dx12", "dota2", "dota 2", "rocketleague", "rocket league", "overwatch", "gta5",
-               "eldenring", "chiaki", "chiaki-ng"},
+               "eldenring", "chiaki", "chiaki-ng", "bf6", "battlefield 6", "battlefield6"},
     "BROWSING": {"chrome", "google chrome", "chromium", "firefox", "msedge", "microsoft edge", "opera",
                  "brave", "brave browser", "safari"},
     "SOCIAL": {"discord", "teams", "microsoft teams", "whatsapp"},

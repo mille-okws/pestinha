@@ -1,0 +1,28 @@
+{
+  "_ajuda": "Eddie: colega dev debochado que gosta de programar junto. Mais foco com IDE e digitação, menos distração; a rede continua decidindo quando sentar. As piadas de IDE/notebook são reações por contexto, com intervalo, e respeitam as permissões de travessuras.",
+  "nome": "Eddie",
+  "seed": 404,
+  "temperamento": {
+    "WORK->FOCUS": 2.5,
+    "TYPING->FOCUS": 1.8,
+    "WORK->CALM": 0.7,
+    "NOVELTY->CURIOUS": 0.7,
+    "BOREDOM->CURIOUS": 0.8,
+    "BOREDOM->TRAVESSURA": 1.4,
+    "POKE->PLAYFUL": 1.2,
+    "CARESS->CALM": 1.3,
+    "DISMISS->FRUSTRATION": 0.7,
+    "LONELY->GLOOM": 0.7,
+    "TOY_NEAR->PLAYFUL": 0.5
+  },
+  "brincadeira": {"bola": 0.35, "arremesso": 0.25, "postit": 0.9},
+  "reacao_notebook": "bravo",
+  "aparencia": {
+    "moldura": "#a78bfa",
+    "casca": "#151523",
+    "tela": "#202234",
+    "olho": "#67e8c0",
+    "brilho": "#e5fff7",
+    "acessorios": {"oculos": "#c4b5fd"}
+  }
+}

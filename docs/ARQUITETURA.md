@@ -84,7 +84,9 @@ As decisões de comportamento saem dos motores de decisão da rede (tabela em
 - condições do corpo (dormindo, segurado, no ar, em missão);
 - estágios do protesto (acúmulo de insatisfação com limiar);
 - sono pela energia;
-- qual travessura fazer (memória episódica com bandit contextual).
+- qual travessura fazer (memória episódica com bandit contextual);
+- comentários opcionais ao entrar na IDE e enquanto usa o notebook, com intervalos fixos e as mesmas
+  permissões das travessuras (`MischiefController.maybe_comment`). Só pets com as frases do contexto participam.
 
 ## Aprendizado
 
@@ -168,7 +170,7 @@ A rede neural decide **a tendência**; as regras decidem **as opções e a execu
 - Memória de travessuras: escolhe, por tentativa e erro, entre as ações que são permitidas naquele momento,
   guardando o que deu certo em cada situação (`core/episodic.py`).
 
-**O que é regra escrita à mão** (são limiares e limites, não decisões do pet):
+**O que é regra escrita à mão** (limiares, limites e reações explícitas por contexto):
 - Como os sentidos viram números: quais programas contam como trabalho, o que é ocioso, o que é tela cheia.
 - Os limiares de disparo (ex.: a raiva precisa passar de um valor para virar cartaz; a fuga precisa encher uma
   carga) e os estágios de insatisfação (quanta raiva para cada estágio).
@@ -176,6 +178,10 @@ A rede neural decide **a tendência**; as regras decidem **as opções e a execu
   permitidas pelas suas permissões.
 - A execução física: para onde ele anda, por quanto tempo, a velocidade e a física da queda e do pouso.
 - O conteúdo que aparece (frases e memes), que vem dos arquivos do personagem.
+- As piadas de IDE/notebook dos personagens com `recadinhos_ide.txt`/`recadinhos_notebook.txt`: entrada
+  em `PROGRAMMING`, entrada no notebook e intervalo sentado. Não dependem do motor TRAVESSURA e não
+  leem código. Respeitam permissões, bloqueios, penalidade por dispensa e limite de objetos; registram
+  o episódio para o carinho e a dispensa continuarem alimentando a memória.
 
 Na prática: a rede decide quando e com que vontade o pet quer fazer algo; as regras decidem o que é possível
 e como isso acontece na tela.

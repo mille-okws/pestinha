@@ -54,6 +54,41 @@ def test_permissoes_voltam_como_foram_deixadas(tmp_path):
     assert again["memes"] is False and again["fotos"] is True
 
 
+def test_sempre_por_cima_muda_na_hora_e_vale_para_novos_objetos(buddy):
+    from pestinha.world.objetos import NoteThing
+
+    buddy.open_settings()
+    caixa = buddy.settings.boxes["sempre_por_cima"]
+    assert caixa.isChecked()
+    posicao = buddy.pet.pos()
+    buddy.ball.hide()
+
+    caixa.setChecked(False)
+    assert not buddy.pet.windowFlags() & Qt.WindowStaysOnTopHint
+    assert not buddy.mesa.caderno.windowFlags() & Qt.WindowStaysOnTopHint
+    assert buddy.pet.windowFlags() & Qt.WindowDoesNotAcceptFocus
+    assert buddy.pet.pos() == posicao
+    assert SettingsStore(buddy.paths)["sempre_por_cima"] is False
+    novo = NoteThing("Novo bilhete")
+    assert not novo.windowFlags() & Qt.WindowStaysOnTopHint
+
+    caixa.setChecked(True)
+    assert buddy.pet.windowFlags() & Qt.WindowStaysOnTopHint
+    assert novo.windowFlags() & Qt.WindowStaysOnTopHint
+    assert not novo.isVisible()             # alterar a preferência não revela objetos escondidos
+    assert SettingsStore(buddy.paths)["sempre_por_cima"] is True
+    assert not buddy.settings.windowFlags() & Qt.WindowStaysOnTopHint
+
+
+@pytest.mark.parametrize("valor", ["false", 0, None, [], {}])
+def test_sempre_por_cima_rejeita_valor_salvo_invalido(tmp_path, valor):
+    from pestinha.store import write_json
+
+    paths = Paths(root=tmp_path)
+    write_json(paths.permissions, {"sempre_por_cima": valor})
+    assert SettingsStore(paths)["sempre_por_cima"] is True
+
+
 def test_panico_fica_desligado_ao_reabrir(tmp_path):
     paths = Paths(root=tmp_path)
     store = SettingsStore(paths)

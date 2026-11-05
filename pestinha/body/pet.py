@@ -12,12 +12,13 @@ import time
 
 from PySide6.QtCore import QRect, QRectF, Qt, Signal
 from PySide6.QtGui import QCursor, QFont, QPainter
-from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QApplication, QWidget
 
 from ..config import EMOTION_NAMES
 from ..core.emotion import EYE_SHAPES
 from ..core.physics import Body
 from .. import plataforma
+from ..log import log
 from ..ajustes import (
     LADO_JANELA_PET as WIN,
     TEMPO_MAX_CUTUCADA_MS as POKE_MAX_MS,
@@ -41,16 +42,58 @@ def set_no_activate(widget):
     """Garante que clicar/mostrar a janela não rouba o foco do programa atual (onde o sistema permite)."""
     try:
         plataforma.sem_foco_nativo(int(widget.winId()))
+        plataforma.definir_nivel_janela(int(widget.winId()), always_on_top())
     except Exception:
         pass    # sem janela nativa (ex.: teste offscreen)
 
 
+def always_on_top():
+    """Preferência da sessão; novas janelas herdam a escolha sem depender dos controladores."""
+    app = QApplication.instance()
+    valor = app.property("pestinha_sempre_por_cima") if app else None
+    return True if valor is None else bool(valor)
+
+
+def set_always_on_top(enabled):
+    """Aplica a preferência aos overlays existentes, inclusive os escondidos, sem abrir diálogos."""
+    app = QApplication.instance()
+    if app is None:
+        return
+    app.setProperty("pestinha_sempre_por_cima", bool(enabled))
+    for widget in app.topLevelWidgets():
+        flags = widget.windowFlags()
+        if widget.windowType() != Qt.Tool or not flags & Qt.WindowDoesNotAcceptFocus:
+            continue
+        if bool(flags & Qt.WindowStaysOnTopHint) != bool(enabled):
+            visible, pos = widget.isVisible(), widget.pos()
+            widget.setWindowFlag(Qt.WindowStaysOnTopHint, enabled)
+            widget.move(pos)
+            if visible:
+                widget.show()                # WA_ShowWithoutActivating continua ligado
+        if widget.windowHandle() is not None:
+            set_no_activate(widget)
+
+
+def raise_without_activating(widget):
+    """Traz o desenho para frente sem tirar o foco de outro aplicativo."""
+    if not widget.isVisible() or not always_on_top():
+        return
+    try:
+        if plataforma.elevar_sem_foco(int(widget.winId())):
+            return
+    except Exception as error:
+        # Não recorrer a raise_ no Cocoa: ele ativaria o processo inteiro.
+        log(f"[janela] não conseguiu reordenar sem foco: {error}")
+        return
+    widget.raise_()
+
+
 def overlay_flags():
-    """Janela sem moldura, sempre por cima, que não aparece na barra de tarefas nem recebe foco ao aparecer."""
+    """Janela sem moldura nem foco, fora da barra de tarefas, respeitando a preferência de ficar por cima."""
     return (
         Qt.FramelessWindowHint
         | Qt.Tool
-        | Qt.WindowStaysOnTopHint
+        | (Qt.WindowStaysOnTopHint if always_on_top() else Qt.WindowType(0))
         | Qt.WindowDoesNotAcceptFocus
     )
 
@@ -69,6 +112,7 @@ class PetWindow(QWidget):
         super().__init__(None, overlay_flags())
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_ShowWithoutActivating)
+        self.setAttribute(Qt.WA_MacAlwaysShowToolWindow)
         self.setFixedSize(WIN, WIN)
 
         self.body = Body(x, y, BODY_W / 2, BODY_H / 2)

@@ -24,6 +24,7 @@ from ..ajustes import (
 from ..log import log
 from ..mathutil import clamp
 from ..world.notebook import Notebook
+from ..body.pet import raise_without_activating
 
 INTERVALO_TOPO = 0.25      # s entre um "trazer para frente" e outro
 
@@ -130,7 +131,7 @@ class MesaController:
         self.caderno.set_working(self.sentado)
         if mudanca and mudanca[1]:
             self.ancora = (self.caderno.x(), self.caderno.y())
-            self.caderno.raise_()                # o notebook fica na frente: ele aparece atrás dele
+            raise_without_activating(self.caderno)  # o notebook fica na frente: ele aparece atrás dele
         if mudanca and mudanca[1] is False:
             self.ancora = None
             brincadeira.next_at = 0.0            # levantou: a bolinha fica mais provável agora
@@ -154,7 +155,7 @@ class MesaController:
         body.vx = body.vy = 0.0
         body.grounded = True
         if now - self.ultimo_topo >= INTERVALO_TOPO:       # o pet não pode ficar por cima do notebook
-            self.caderno.raise_()
+            raise_without_activating(self.caderno)
             self.ultimo_topo = now
         return None
 

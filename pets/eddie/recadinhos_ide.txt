@@ -1,0 +1,9 @@
+# Reações ao entrar numa IDE. Uma por linha; sem ler o código de verdade.
+Qual é o bug que você vai criar hoje?
+Abriu a IDE? Já vou separar o café.
+Hoje a gente programa ou só renomeia variável?
+É uma alteração pequena? Essa eu já ouvi.
+Pode codar. Eu seguro o console.
+Vai abrir uma branch ou inaugurar um incidente?
+Se funcionar de primeira, desconfia.
+O debugger abriu um sorriso. Você chegou.

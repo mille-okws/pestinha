@@ -75,6 +75,8 @@ def scene(qt_app, tmp_path, monkeypatch, request):
         body, state, behavior = app.pet.body, app.pet_state, app.behavior
         c = app.castigo
     else:
+        # Aqui o pet é um dublê; foco nativo é exercitado em test_foco.py.
+        monkeypatch.setattr("pestinha.mind.castigo_ctl.raise_without_activating", lambda janela: janela.raise_())
         state = PetState()
         body = Body(100, 600, 30, 35)
         behavior = Behavior(body, state, Mock())

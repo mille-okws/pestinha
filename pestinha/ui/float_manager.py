@@ -10,6 +10,7 @@ from PySide6.QtGui import QGuiApplication
 
 from .monitor import NeuralMonitor
 from .panel import StrikePanel
+from ..body.pet import raise_without_activating
 
 KEYS = ("neural", "greve")
 
@@ -53,7 +54,7 @@ class FloatManager:
         self.opened.add(key)
         w = self.window(key)
         w.show()
-        w.raise_()
+        raise_without_activating(w)
 
     def close(self, key):
         """Fecha um painel e o esquece da lista de abertos."""

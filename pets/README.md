@@ -27,6 +27,8 @@ Pode editar com ele aberto: ele relê os textos e procura imagens novas sozinho.
 |---|---|
 | `memes/<emoção>/` | Imagens (.png .jpg .gif .webp .bmp) que ele traz com aquela emoção: `feliz`, `contente`, `observando`, `curioso` (arrastadas pela tela), `bravo` (pequenas, num cantinho), `triste`, `assustado`, `dramatico`. Se a pasta da emoção estiver vazia, usa um meme de outra emoção **do mesmo pet**. |
 | `memes/trabalhando/` | Memes de quando você programa e ele não está sentado no notebook. |
+| `recadinhos_ide.txt`, `recadinhos_notebook.txt` | Opcionais: ativam comentários ao entrar numa IDE ou enquanto o pet usa o notebook. Uma frase por linha. Sem o arquivo correspondente, não há reação contextual. |
+| `memes/notebook/` | Memes para os comentários enquanto o pet está sentado. Os de entrada na IDE usam `memes/trabalhando/`. |
 | `recadinhos.txt` | Uma frase por linha, sorteada para os post-its. `#` é comentário. |
 | `recadinhos_tristes.txt` | Bilhetes que ele cola quando está triste. |
 | `cartazes.txt` | Cartazes por seção: `[reclamacao]`, `[manifestacao]`, `[greve]`, `[revolucao]`, `[acordo]`, `[desistiu]`, `[saudade]`, `[chorando]`, `[abandonado]`, `[volto]`, e no cantinho do castigo `[castigo]` e `[xingamento]`. |
@@ -39,6 +41,14 @@ de outro pet.
 ## Personagens que já existem
 
 - **Bryan** (`bryan.json`, `bryan/`): o original.
+- **Eddie** (`eddie.json`, `eddie/`): colega dev debochado, de óculos, olhos verde-menta e moldura lilás.
+  IDE e digitação aumentam mais o foco, favorecendo o notebook. Tem 22 memes em pixel art gerados
+  com imagegen integrado (prompts em `eddie/memes/prompts.json`), além de recadinhos e cartazes próprios.
+  Seu brinquedo é um cubo mágico com fundo transparente, salvo em `eddie/bolinha_tenis.png`
+  para substituir a bola apenas nele (prompt em `eddie/cubo_magico.prompt.txt`).
+  `ferramentas/gerar_memes_eddie.py` valida as imagens e exporta as frases; não sobrescreve as artes.
+  Não lê código nem executa
+  as "correções" das piadas. Para os comentários, ligue Travessuras e memes e/ou bilhetes.
 - **Jorge** (`jorge.json`, `jorge/`): coach trambiqueiro. Mais insistente quando ignorado, muito animado
   com atenção, desesperado quando dispensam as coisas dele e quase nunca triste. O panfleto que ele atira
   (`jorge/bolinha_papel.png`) é desenhado por `ferramentas/gerar_panfleto.py`. Moldura e olhos dourados
@@ -55,3 +65,8 @@ de outro pet.
 
 Cada chave do `temperamento` precisa ser uma ligação que existe (`SENSOR->INTERNEURÔNIO` ou só o
 interneurônio); `tests/test_jorge.py` confere isso para todos os pets.
+
+Os comentários contextuais são regras explícitas, separadas das travessuras sorteadas pela rede.
+Há pelo menos 90 segundos entre eles e uma tentativa a cada 120 segundos no notebook. Trocar
+rapidamente de app não cria uma fila; eventos bloqueados pelas permissões são descartados.
+Textos e imagens continuam isolados por personagem. Os intervalos ficam em `pestinha/ajustes.py`.
