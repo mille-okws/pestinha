@@ -10,3 +10,6 @@ license-files = ["LICENSE"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+markers = [
+    "macos_real: abre janelas de verdade no macOS (pule com -m \"not macos_real\")",
+]

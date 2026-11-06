@@ -1,8 +1,8 @@
 """
 macOS: Quartz (pyobjc) para as janelas e o tempo ocioso; AppKit para o programa em primeiro plano.
 
-Sem pyobjc, o tempo ocioso sai do ioreg. O atalho global usa pynput, e o macOS pede permissão de
-Acessibilidade na primeira vez. Os retângulos saem em pixels físicos (pontos x escala).
+Sem pyobjc, o tempo ocioso sai do ioreg. O atalho global usa o QuickMacHotKey, na thread principal.
+Os retângulos saem em pixels físicos (pontos x escala).
 """
 
 import os
@@ -22,6 +22,8 @@ from quickmachotkey.constants import (
 LARGURA_MINIMA, ALTURA_MINIMA = 120, 60
 OPCOES_NA_TELA = (1 << 0) | (1 << 4)        # OnScreenOnly | ExcludeDesktopElements
 JANELA_NULA = 0
+PAINEL_SEM_ATIVAR = 1 << 7                  # NSWindowStyleMaskNonactivatingPanel
+EM_TODOS_OS_ESPACOS = (1 << 0) | (1 << 4) | (1 << 8)    # CanJoinAllSpaces | Stationary | FullScreenAuxiliary
 _hotkey = None
 
 def _quartz():
@@ -145,8 +147,25 @@ def janelas_visiveis(excluir, escala=1.0):
     return janelas_de(_listar(quartz), os.getpid(), excluir, escala)
 
 
+def manter_na_frente(janela):
+    """Qt.Tool vira um NSPanel que some quando o programa perde o foco e fica preso a um Space: desfaz os dois."""
+    janela.setHidesOnDeactivate_(False)
+    janela.setStyleMask_(janela.styleMask() | PAINEL_SEM_ATIVAR)    # sem isto, não aparece sobre tela cheia
+    janela.setCollectionBehavior_(EM_TODOS_OS_ESPACOS)
+
+
 def sem_foco_nativo(janela_id):
-    """No macOS o pet já é uma janela sem foco (Qt.WA_ShowWithoutActivating); nada a fazer aqui."""
+    """A janela fica na frente de tudo, em todos os Spaces, e clicar nela não ativa o programa."""
+    app = QApplication.instance()
+    if app is None or app.platformName() != "cocoa":
+        # Sem janela nativa (ex.: teste offscreen) o id não é um NSView e usá-lo derrubaria o processo.
+        # Sem QApplication, QApplication.platformName() responde "cocoa" mesmo assim: por isso a instância.
+        return
+    try:
+        import objc
+        manter_na_frente(objc.objc_object(c_void_p=janela_id).window())
+    except Exception:
+        pass        # sem pyobjc: o pet funciona, mas volta a sumir ao trocar de programa
 
 
 def iniciar_atalho(callback):

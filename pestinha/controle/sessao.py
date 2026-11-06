@@ -84,14 +84,14 @@ class SessaoMixin:
 
     def open_settings(self):
         """Abre a tela de configurações (ou traz para frente se já estiver aberta)."""
-        if self.settings and self.settings.isVisible():
-            self.settings.raise_()
-            return
-        self.settings = SettingsDialog(self.perms, self.paths, first_run=False)
-        self.settings.changed.connect(self.apply_perms)
-        self.settings.wipe_all.connect(self.wipe_all_data)
-        self.settings.history_wiped.connect(self.timeline.discard)
-        self.settings.show()
+        if not (self.settings and self.settings.isVisible()):
+            self.settings = SettingsDialog(self.perms, self.paths, first_run=False)
+            self.settings.changed.connect(self.apply_perms)
+            self.settings.wipe_all.connect(self.wipe_all_data)
+            self.settings.history_wiped.connect(self.timeline.discard)
+            self.settings.show()
+        self.settings.raise_()
+        self.settings.activateWindow()      # veio do pet ou da bandeja: o programa pode nem estar ativo
 
     def toggle_floating(self):
         """Mostra ou esconde os painéis de teste."""

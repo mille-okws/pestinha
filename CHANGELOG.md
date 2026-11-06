@@ -1,5 +1,13 @@
 # Histórico de versões
 
+## macOS: o pet fica na frente de tudo
+
+- O pet, a bolinha e os painéis sumiam ao clicar em outro programa: o `Qt.Tool` vira um `NSPanel` com
+  `hidesOnDeactivate`. Agora ficam na tela, em todos os Spaces e sobre programas em tela cheia.
+- Clicar no pet não ativa mais o programa, como já acontecia no Windows. As Configurações pedem o foco ao abrir.
+- Testes num Mac de verdade (`tests/test_macos_real.py`), também no CI: as janelas do pet continuam na tela
+  quando outro programa ganha o foco, o atalho de pânico registra e as leituras do sistema têm o formato certo.
+
 ## 0.8.0 — melhorias para o Windows
 
 ### Correções

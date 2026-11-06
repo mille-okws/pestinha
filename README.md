@@ -221,8 +221,9 @@ As imagens e os textos de `assets/` não estão cobertos por esta licença
 
 ## Limitações conhecidas
 
-- macOS e Linux ainda não foram testados numa máquina real: a parte de leitura das janelas e do teclado foi
-  escrita e testada só nas partes de texto (ver `tests/test_plataforma.py`).
+- Linux ainda não foi testado numa máquina real: a parte de leitura das janelas e do teclado foi escrita e
+  testada só nas partes de texto (ver `tests/test_plataforma.py`). No macOS, `tests/test_macos_real.py` abre
+  janelas de verdade e lê o sistema num Mac real, inclusive no CI.
 - No macOS, o pet precisa da permissão de Acessibilidade para o atalho Ctrl+Alt+Shift+B funcionar.
 - No Linux com Wayland, o pet não enxerga janelas nem o tempo ocioso, e o atalho global não funciona.
 - Pouco testado com escala de tela acima de 100% e com vários monitores. A tela cheia num monitor esconde o

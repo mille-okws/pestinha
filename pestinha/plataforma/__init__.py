@@ -9,7 +9,7 @@ escolhe o certo na importação. Os retângulos são em pixels físicos (o app d
     retangulo_ativo(escala)      retângulo da janela em primeiro plano, ou None
     tela_cheia()                 a janela em primeiro plano cobre o monitor inteiro
     janelas_visiveis(excluir, escala)   [(id, (l, t, r, b), maximizada)] de cima para baixo
-    sem_foco_nativo(janela_id)   a janela do pet não rouba o foco (quando o sistema permite)
+    sem_foco_nativo(janela_id)   a janela do pet não rouba o foco (quando o sistema permite); no macOS, fica na frente de tudo
     iniciar_atalho(callback)     Ctrl+Alt+Shift+B; devolve True se registrou
 
 Só no Windows, por enquanto (TEM_INICIO_AUTOMATICO diz se existe):

@@ -2,8 +2,8 @@
 Plataforma: cada sistema expõe as mesmas funções, e as leituras de texto (wmctrl, xdotool, ioreg,
 janelas do Quartz) são testadas com saídas de exemplo, em qualquer sistema.
 
-Não há Mac nem Linux nos testes automatizados: o caminho real desses sistemas ainda precisa ser
-testado numa máquina de verdade (ver README).
+O caminho real do macOS é testado num Mac de verdade em test_macos_real.py. O do Linux ainda precisa
+ser testado numa máquina de verdade (ver README).
 """
 import sys
 from pathlib import Path
