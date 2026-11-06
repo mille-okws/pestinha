@@ -28,6 +28,7 @@ class ProtestController:
         self.state = state          # PetState: protest_stage é espelhado aqui
         self.debug = debug
         self.visivel = True         # o cartaz novo nasce com a visibilidade da sessão
+        self.ao_mostrar = None      # chamado com o texto de cada cartaz novo (a voz)
 
     @property
     def stage(self):
@@ -92,6 +93,8 @@ class ProtestController:
         self.protest.sign = sign
         self.carry(time.monotonic(), asleep=False)
         sign.setVisible(self.visivel)
+        if self.ao_mostrar is not None and self.visivel:
+            self.ao_mostrar(getattr(sign, "text", ""))
 
     def drop_sign(self):
         """Tira o cartaz que está sendo mostrado."""

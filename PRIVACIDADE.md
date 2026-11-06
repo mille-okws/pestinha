@@ -2,6 +2,12 @@
 
 O Pestinha roda só no seu computador. Ele não envia nada para a internet.
 
+Ele só usa a internet quando você pede para instalar a **voz natural** (Configurações > Voz natural...) ou
+as **frases com IA** (`python -m pestinha.mind.ia_local --instalar`). A voz natural baixa bibliotecas do
+PyPI (PyTorch e OmniVoice) e o modelo do Hugging Face. As frases com IA baixam o llama.cpp do GitHub e o modelo
+do Hugging Face. Ele não manda nenhum dado seu, só os pedidos de download normais (o seu IP fica visível para
+esses sites, como em qualquer download). Depois de instalados, os modelos rodam sem internet.
+
 ## O que ele lê
 
 - O **nome** do programa em primeiro plano (por exemplo `code.exe`). Nunca o título nem o conteúdo da janela.
@@ -27,6 +33,8 @@ Do app e seu, direto em `memory/`:
 | `timeline.csv` | Uma linha por minuto: hora, categoria de programa, trocas de janela, ocioso. Só com "Registrar minha rotina" ligado, que vem desligado. O pet ainda não usa esse histórico |
 | `panels.json` | Posição dos painéis, do notebook e da placa |
 | `logs/pestinha.log` | Mensagens do programa e erros inesperados (sem conteúdo de janelas) |
+| `logs/voz_natural.log` | Só com a voz natural: avisos e erros do modelo |
+| `voz/<pet>/` | Só com a voz natural: as falas já geradas (um `.wav` por frase e emoção), para tocar na hora da próxima vez. O nome do arquivo é um código; o texto não fica gravado à parte |
 
 De cada personagem, em `memory/pets/<pet>/` (um personagem não lê a memória do outro):
 
@@ -53,6 +61,16 @@ os arquivos antigos e avisa no ícone da bandeja.
 - Você também pode apagar a pasta `memory/` manualmente, com o programa fechado.
 
 ## Fora da pasta de dados
+
+- **Voz natural** (só se você instalar): a pasta `voz_natural/`, ao lado do programa, com o PyTorch e o modelo
+  (uns 4,5 GB). Não tem nenhum dado seu. **Apagar todos os dados** não apaga essa pasta; use **Remover** na
+  tela da voz natural.
+- **Falar os bilhetes e cartazes** (desligado por padrão): o texto do post-it ou do cartaz vai para a voz do
+  sistema (`say`) ou para o modelo, os dois no seu computador.
+- **Frases com IA** (só se você instalar): a pasta `ia_local/`, ao lado do programa, com o llama.cpp e o modelo
+  (uns 1,3 GB). Não tem nenhum dado seu. O pedido ao modelo leva o que o pet sente, a categoria do programa
+  em primeiro plano (programando, jogando...; nunca o nome nem o título da janela), a parte do dia e frases
+  do pet. Fica no seu computador e não é gravado; o log anota só quanto tempo levou (a frase, só no Modo teste).
 
 - **Abrir ao entrar no Windows** (desligado por padrão) grava uma entrada em
   `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, só para o seu usuário.

@@ -12,8 +12,13 @@ python -m pytest -q
 O `python -m pytest` na raiz roda `tests/` (ver `pyproject.toml`). Testes que montam o
 app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 
+A exceção é `test_macos_real.py`: no macOS, abre janelinhas de verdade por alguns segundos (num processo
+à parte, `macos_cocoa.py`) e devolve o foco ao programa que estava na frente. Para pular:
+`python -m pytest -m "not macos_real"`.
+
 | Arquivo | O que faz |
 |---|---|
+| `macos_cocoa.py` | Roda em outro processo, com o Qt no Cocoa de verdade, para o test_macos_real.py. |
 | `test_30_bugs.py` | Regressão dos 30 bugs encontrados na rodada de fuzzing e revisão (docs/auditorias/BUGS_30_RODADA.md). |
 | `test_aparencia.py` | Etapa 5 do multipet: cores e acessórios por pet, numa camada por cima do rosto. |
 | `test_app.py` | Testes de integração do app, com Qt em modo offscreen e tudo numa pasta temporária. |
@@ -34,7 +39,10 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_escolha_pet.py` | Etapa 3 do multipet: escolha do personagem nas configurações e o nome certo em cada texto. |
 | `test_festa.py` | Fogos de artifício ligados à rede e brincadeira mais animada quando feliz. |
 | `test_homeostase.py` | Homeostase: trabalhar é estímulo, então o tédio não sobe enquanto ele programa. |
+| `test_ia_local.py` | IA local (em teste): instalação do llama.cpp e do modelo, o pedido que sai do estado da rede, a limpeza da resposta, a geração em outro processo e o post-it que ele entrega. |
+| `test_janela_na_frente.py` | No macOS o pet não some ao trocar de programa; as Configurações pedem o foco. |
 | `test_jorge.py` | Etapa 4 do multipet: o Jorge, segundo personagem, feito só de configuração e conteúdo. |
+| `test_macos_real.py` | Janelas, atalho e leituras do sistema num Mac real, sem imitar o AppKit. |
 | `test_melhorias_windows.py` | Melhorias para o Windows: tela cheia, vários monitores, pasta de dados, uma cópia só, início automático e fechamento seguro. |
 | `test_mesa.py` | Notebook: sentar e levantar pelo disparo do neurônio SENTAR. |
 | `test_migracao.py` | Etapa 1 do multipet: memória por pet (memory/pets/<pet>/) e a migração da versão antiga. |
@@ -44,3 +52,4 @@ app inteiro usam um relógio virtual: avançam o tempo sem esperar.
 | `test_plataforma.py` | Plataforma: cada sistema expõe as mesmas funções, e as leituras de texto (wmctrl, xdotool, ioreg, janelas do Quartz) são testadas com saídas de exemplo, em qualquer sistema. |
 | `test_robustez.py` | Robustez: arquivo corrompido, assets faltando, log em arquivo. |
 | `test_robustez_v2.py` | Falhas do relatório técnico (docs/auditorias/ANALISE_TECNICA.md): cada caso tem um teste que reproduz o problema. |
+| `test_voz.py` | Voz: texto e emoção, cache, voz natural (motor e trabalhador do OmniVoice), instalação e a tela. |

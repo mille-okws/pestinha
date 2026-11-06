@@ -8,8 +8,11 @@ Mixin de PestinhaApp: usa os atributos criados em PestinhaApp.__init__.
 """
 
 from ..log import log
+import random
 import time
-from PySide6.QtWidgets import QMenu
+from PySide6.QtWidgets import QMenu, QSystemTrayIcon
+from .. import config
+from ..mind import frases_ia
 from ..body.pet import cursor_pos
 from ..ajustes import (
     INSATISFACAO_NOTEBOOK,
@@ -92,6 +95,8 @@ class InteracaoMixin:
 
     def on_dismissed(self, thing, elapsed):
         """Você dispensou uma travessura: ela some, e o tempo até você fechar vira aprendizado (fechar rápido é pior)."""
+        if isinstance(getattr(thing, "text", None), str):
+            self.voz.parar(thing.text)               # fechou o post-it que ele estava lendo: ele para
         if self._congelado():
             return                                   # o objeto some, mas não vira aprendizado na pausa
         self.mischief_ctl.on_dismissed(thing, elapsed, self.prof, time.monotonic())
@@ -127,6 +132,13 @@ class InteracaoMixin:
         item("Mostrar o notebook" if self.mesa.escondido else "Esconder o notebook",
              self.menu_alternar_notebook)
         item("Fazer uma travessura agora", self.menu_mischief, perms["travessuras"])
+        if self.frases_ia.ocupada():
+            item("Escrevendo o que sente...", lambda: None, False)
+        elif self.frases_ia.instalada():
+            item("Escrever o que está sentindo (IA)", self.menu_frase_ia,
+                 perms["travessuras"] and perms["bilhetes"])
+        else:
+            item("Escrever o que está sentindo (IA não instalada)", lambda: None, False)
         menu.addSeparator()
         item("Cantinho do castigo", lambda: self.castigo.toggle(self.bounds()))
         item("Painel de protesto", lambda: self.floats.toggle("greve"))
@@ -173,6 +185,48 @@ class InteracaoMixin:
     def menu_mischief(self):
         """Menu: 'Aprontar' (pede uma travessura agora)."""
         self.mischief_ctl.pedir(time.monotonic())
+
+    # ---------------- frases com IA (em teste) ----------------
+
+    def estado_para_ia(self):
+        """O que a rede sente agora, do jeito que entra no pedido da IA (só a categoria do programa)."""
+        sentidos = self.drives.channels()
+        return {"emocao": self.pet_state.emotion, "cansaco": sentidos["FATIGUE"],
+                "carencia": sentidos["LONELY"], "tedio": sentidos["BOREDOM"], "atividade": self.activity,
+                "protesto": self.protest.stage, "hora": time.localtime().tm_hour}
+
+    def menu_frase_ia(self):
+        """Menu: 'Escrever o que está sentindo (IA)'. A rede diz o que ele sente; a IA local escreve."""
+        triste = self.pet_state.emotion == "triste"
+        notas = self.mischief.notes_sad if triste else self.mischief.notes
+        notas.has_lines()                                       # relê o arquivo se mudou
+        exemplos = random.sample(notas.lines, min(frases_ia.EXEMPLOS, len(notas.lines)))
+        sistema, pedido = frases_ia.montar(self.nome, self.personalidade, self.estado_para_ia(), exemplos)
+        if self.frases_ia.pedir(sistema, pedido, evitar=notas.lines) and self.debugging():
+            log(f"[ia] pedido: {pedido.splitlines()[0]}")
+
+    def _frase_ia_pronta(self, texto, segundos):
+        """A IA escreveu: ele entrega o post-it, se ainda puder aparecer agora."""
+        log(f"[ia] escreveu em {segundos:.1f} s: {texto!r}" if self.debugging() else
+            f"[ia] escreveu em {segundos:.1f} s")
+        perms = self.perms
+        if not (perms["ativo"] and perms["travessuras"] and perms["bilhetes"]) \
+                or not self.pet.isVisible() or self._congelado():
+            return                                              # desligaram, esconderam ou pausaram no meio
+        thing = self.mischief.bilhete(texto)
+        body = self.pet.body
+        livre = (self.behavior.mission is None and not body.held and body.grounded
+                 and not self.asleep and not self.castigo.dentro)
+        if livre:
+            self.behavior.start_mission(("deliver", thing), self.bounds(), self.last_cursor, time.monotonic())
+        elif not self.mischief.show_in_corner(thing, self.bounds(), self.last_cursor):
+            log("[ia] não achou lugar para o post-it")
+
+    def _frase_ia_falhou(self, motivo):
+        """A IA não conseguiu escrever: avisa no ícone da bandeja (ainda é teste)."""
+        log(f"[ia] não escreveu: {motivo}")
+        self.tray.icon.showMessage(config.APP_NOME, f"{self.nome} não conseguiu escrever agora ({motivo}).",
+                                   QSystemTrayIcon.Information, 4000)
 
     def menu_alternar_notebook(self):
         """Menu: mostra ou esconde o notebook; sem o notebook, ele não pode sentar nele."""

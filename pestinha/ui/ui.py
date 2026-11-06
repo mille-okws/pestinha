@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
 )
 
 from .. import config
+from ..mind.voz_motor import instalada as voz_natural_instalada
 from ..sense import timeline
 from ..core.emotion import EYE_SHAPES
 from ..body.pet import draw_face
@@ -45,6 +46,7 @@ QPushButton { background: #17201a; color: #dfffe6; border: 1px solid #2c5236;
               border-radius: 6px; padding: 7px 18px; font-size: 13px; }
 QPushButton#start { background: #2c8a40; border-color: #63e56f; font-weight: bold; }
 QPushButton:hover { border-color: #63e56f; }
+QPlainTextEdit { background: #08150c; color: #b9f5c8; border: 1px solid #24402c; font: 11px 'Menlo'; }
 """
 
 
@@ -70,6 +72,8 @@ class SettingsDialog(QDialog):
     changed = Signal(dict)
     wipe_all = Signal()
     history_wiped = Signal()
+    voz_natural_mudou = Signal()          # instalou ou removeu a voz natural
+    voz_natural_vai_mudar = Signal()      # vai remover: o app fecha o motor antes
 
     def __init__(self, perms, paths, first_run=True):
         """Tela de permissões e configurações. Trabalha numa cópia das permissões: cada mudança é avisada ao app na hora."""
@@ -164,6 +168,17 @@ class SettingsDialog(QDialog):
             if group_title == "Travessuras":
                 self.resumo = self._asset_summary()
                 layout.addWidget(self.resumo)
+            if group_title == "Voz":
+                row = QHBoxLayout()
+                self.voz_status = QLabel()
+                self.voz_status.setObjectName("hint")
+                self.voz_status.setWordWrap(True)
+                row.addWidget(self.voz_status, 1)
+                natural = QPushButton("Voz natural...")
+                natural.clicked.connect(self._abrir_voz_natural)
+                row.addWidget(natural)
+                layout.addLayout(row)
+                self._atualizar_voz_status()
             if group_title == "Rotina":
                 row = QHBoxLayout()
                 self.history_label = QLabel()
@@ -231,6 +246,26 @@ class SettingsDialog(QDialog):
         self.resumo.setText(f"Conteúdo de {nome}: {memes} memes de emoção, {trabalho} de trabalho, {photos} fotos, "
                             f"{len(notes.lines)} recadinhos e {len(tristes.lines)} bilhetes tristes.")
 
+    def _atualizar_voz_status(self):
+        """Linha que diz se a voz natural está instalada."""
+        if not plataforma.TEM_VOZ:
+            self.voz_status.setText("Neste sistema, o pet ainda não fala (por enquanto, só no macOS).")
+        elif voz_natural_instalada(self.paths.voz_natural):
+            self.voz_status.setText("Voz natural: instalada (cada pet fala com a voz dele).")
+        else:
+            self.voz_status.setText("Voz natural: não instalada (usa a voz do sistema). "
+                                    "Veja se o seu computador aguenta:")
+
+    def _abrir_voz_natural(self):
+        """Abre a tela que confere o computador e instala a voz natural."""
+        from .voz_natural import VozNaturalDialog
+        dialogo = VozNaturalDialog(self.paths, self)
+        dialogo.vai_mudar.connect(self.voz_natural_vai_mudar)
+        dialogo.mudou.connect(self.voz_natural_mudou)
+        dialogo.mudou.connect(self._atualizar_voz_status)
+        dialogo.exec()
+        self._atualizar_voz_status()
+
     def _update_history_label(self):
         """Mostra quantos minutos de rotina estão gravados."""
         minutes = timeline.count_rows(self.paths.timeline)
@@ -288,6 +323,7 @@ class SettingsDialog(QDialog):
         for key in ("memes", "fotos", "bilhetes"):
             self.boxes[key].setEnabled(master)
         self.boxes["mostrar_emocao"].setEnabled(self.perms["modo_teste"])
+        self.boxes["voz"].setEnabled(plataforma.TEM_VOZ)
 
     def set_active(self, on):
         """Atualiza a caixa 'ligado' sem disparar a gravação (usado pelo pânico)."""

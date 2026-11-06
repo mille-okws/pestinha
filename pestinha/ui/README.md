@@ -14,3 +14,4 @@ Janelas de interface: tela de permissões, bandeja, passo a passo, monitor neura
 | `panel.py` | Medidor de protesto: quanto falta para ele entrar em greve. |
 | `rotulos.py` | Os nomes que aparecem na tela, em português. |
 | `ui.py` | Tela inicial de permissões, ícone na bandeja e atalho de pânico. |
+| `voz_natural.py` | A tela que confere se o computador aguenta o OmniVoice, explica o que vai ser baixado, instala (com o andamento na tela) e remove. |

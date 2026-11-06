@@ -50,6 +50,7 @@ DEFAULT_PERMISSIONS = {
     "mostrar_emocao": False,   # só vale com modo_teste ligado
     "bolinha": True,           # a bolinha para ele brincar
     "fogos": True,             # fogo de artifício quando ele fica feliz de verdade (rede)
+    "voz": False,              # lê os post-its e cartazes em voz alta (só macOS, por enquanto)
 }
 
 # (chave, rótulo, descrição) na ordem da tela inicial
@@ -59,6 +60,12 @@ PERMISSION_GROUPS = [
         ("memes", "Trazer memes", "Imagens de pets/<pet>/memes/<emoção>/."),
         ("fotos", "Trazer fotos", "Imagens de assets/comum/fotos/."),
         ("bilhetes", "Deixar bilhetes", "Post-its com frases de pets/<pet>/recadinhos.txt."),
+    ]),
+    ("Voz", [
+        ("voz", "Falar os bilhetes e cartazes",
+         "Ele lê em voz alta os post-its e os cartazes, com a emoção que está sentindo. Com a voz natural "
+         "instalada, fala com a voz dele; sem ela, com a voz do sistema. Só no macOS, por enquanto. "
+         "Fica calado escondido, pausado ou em tela cheia."),
     ]),
     ("Interação", [
         ("cutucar", "Cutucar", "Clicar nele é uma cutucada, e ele reage."),
@@ -249,6 +256,18 @@ def _numero_ok(valor, minimo=0.0):
             and valor >= minimo)
 
 
+def _voz_valida(voz):
+    """Campos da voz do pet: `sistema` (nome da voz do macOS), `velocidade` (0.5 a 2) e `seed` (inteiro ≥ 0)."""
+    out = {}
+    if isinstance(voz.get("sistema"), str) and voz["sistema"].strip():
+        out["sistema"] = voz["sistema"].strip()
+    if _numero_ok(voz.get("velocidade")) and 0.5 <= voz["velocidade"] <= 2.0:
+        out["velocidade"] = float(voz["velocidade"])
+    if type(voz.get("seed")) is int and voz["seed"] >= 0:
+        out["seed"] = voz["seed"]
+    return out
+
+
 def _pet_valido(saved):
     """Só os campos do tipo certo entram; o resto fica com o padrão."""
     out = {}
@@ -264,6 +283,12 @@ def _pet_valido(saved):
         out["temperamento"] = dict(temp)
     if saved.get("reacao_notebook") in ("bravo", "triste"):
         out["reacao_notebook"] = saved["reacao_notebook"]
+    voz = saved.get("voz")
+    if isinstance(voz, dict):
+        out["voz"] = _voz_valida(voz)
+    pers = saved.get("personalidade")
+    if isinstance(pers, str) and pers.strip():
+        out["personalidade"] = pers.strip()[:600]      # entra no pedido da IA local: curto de propósito
     if isinstance(saved.get("aparencia"), dict):
         out["aparencia"] = dict(saved["aparencia"])    # cores e acessórios: validados em body/desenho_rosto.py
     return out

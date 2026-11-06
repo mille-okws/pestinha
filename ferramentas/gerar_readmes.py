@@ -106,7 +106,11 @@ python -m pytest -q
 ```
 
 O `python -m pytest` na raiz roda `tests/` (ver `pyproject.toml`). Testes que montam o
-app inteiro usam um relógio virtual: avançam o tempo sem esperar."""),
+app inteiro usam um relógio virtual: avançam o tempo sem esperar.
+
+A exceção é `test_macos_real.py`: no macOS, abre janelinhas de verdade por alguns segundos (num processo
+à parte, `macos_cocoa.py`) e devolve o foco ao programa que estava na frente. Para pular:
+`python -m pytest -m "not macos_real"`."""),
     ("ferramentas", "geradores de documentação", """Rode depois de mudar módulos ou a rede, para a documentação não desatualizar:
 
 ```bash

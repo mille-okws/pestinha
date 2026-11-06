@@ -68,6 +68,9 @@ from .mind.mischief_ctl import MischiefController
 from .mind.protest_ctl import ProtestController
 from .mind.revolucao import RevolucaoController
 from .mind.sleep import SleepController
+from .mind.voz import Voz
+from .mind.voz_motor import MotorVoz
+from .mind.frases_ia import FrasesIA
 from .paths import Paths
 from .sense import senses
 from .sense.timeline import TimelineRecorder
@@ -175,6 +178,20 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
                                                self.behavior, self.emotion, self.debugging)
         self.floats = FloatManager(self)
         self.mischief_ctl.postit_weight = Play(self.play_weights).weight("postit")
+        # ----- voz: lê post-its e cartazes (voz natural, se instalada; senão a do sistema) -----
+        self.voz = Voz(self.paths.voz(pet_id), motor=MotorVoz(self.paths.voz_natural, self.paths.log_voz),
+                       referencia=self.conteudo.voz_referencia,
+                       referencia_texto=self.conteudo.voz_referencia_texto, ajustes=pet_def.get("voz"))
+        self.mischief.bilhete_novo.connect(self.falar)
+        self.protest_ctl.ao_mostrar = lambda texto: self.falar(texto, "bravo")     # protesto é raiva
+        self.sad_ctl.ao_mostrar = lambda texto: self.falar(texto, "triste")        # abandono é tristeza
+        if self.perms["voz"]:
+            self.voz.ligar()                         # o modelo já carrega antes do primeiro post-it
+        # ----- frases com IA (em teste): a rede sente, a IA local só escreve -----
+        self.personalidade = pet_def.get("personalidade")
+        self.frases_ia = FrasesIA(self.paths.ia_local, parent=self)
+        self.frases_ia.pronta.connect(self._frase_ia_pronta)
+        self.frases_ia.falhou.connect(self._frase_ia_falhou)
         self.festa = FestaController(self.debugging)
         self.mesa = MesaController(self.debugging, self)
         self.castigo = CastigoController(self, self.debugging)
@@ -247,6 +264,14 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
     def asleep(self):
         """Diz se o pet está dormindo."""
         return self.sleep.asleep
+
+    def falar(self, texto, emocao=None):
+        """Um post-it ou cartaz apareceu: lê em voz alta com a emoção da hora (a dele, se não vier outra)."""
+        if self.perms["voz"] and self.pet.isVisible() and not self._congelado():
+            emocao = emocao or self.pet_state.emotion
+            self.voz.dizer(texto, emocao)
+            if self.debugging():
+                log(f"[voz] {emocao}: {texto!r}")
 
     # ---------------- geometria ----------------
 

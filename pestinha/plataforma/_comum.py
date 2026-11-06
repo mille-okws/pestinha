@@ -14,6 +14,22 @@ def rodar(comando, tempo=1.0):
     return resultado.stdout if resultado.returncode == 0 else None
 
 
+def iniciar(comando, entrada=None):
+    """Começa o comando sem esperar e devolve o processo (para poder parar), ou None se não deu."""
+    try:
+        processo = subprocess.Popen(comando, stdin=subprocess.PIPE if entrada is not None else subprocess.DEVNULL,
+                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except (OSError, ValueError):
+        return None
+    if entrada is not None:
+        try:
+            processo.stdin.write(entrada.encode("utf-8"))
+            processo.stdin.close()
+        except OSError:
+            pass
+    return processo
+
+
 def atalho_pynput(callback):
     """Ctrl + Alt + Shift + B em qualquer lugar do sistema. Precisa de pynput instalado."""
     try:
