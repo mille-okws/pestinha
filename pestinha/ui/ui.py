@@ -18,12 +18,15 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QSpinBox,
     QSystemTrayIcon,
     QWidget,
     QVBoxLayout,
 )
 
 from .. import config
+from ..mind import ia_local
+from ..mind.voz_motor import instalada as voz_natural_instalada
 from ..sense import timeline
 from ..core.emotion import EYE_SHAPES
 from ..body.pet import draw_face
@@ -41,10 +44,13 @@ QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 4px; }
 QCheckBox { color: #dfffe6; font-size: 13px; spacing: 8px; }
 QCheckBox:disabled { color: #4d6655; }
 QComboBox { background: #17201a; color: #dfffe6; border: 1px solid #2c5236; padding: 3px 6px; }
+QSpinBox { background: #17201a; color: #dfffe6; border: 1px solid #2c5236; padding: 2px 4px; }
+QSpinBox:disabled { color: #4d6655; }
 QPushButton { background: #17201a; color: #dfffe6; border: 1px solid #2c5236;
               border-radius: 6px; padding: 7px 18px; font-size: 13px; }
 QPushButton#start { background: #2c8a40; border-color: #63e56f; font-weight: bold; }
 QPushButton:hover { border-color: #63e56f; }
+QPlainTextEdit { background: #08150c; color: #b9f5c8; border: 1px solid #24402c; font: 11px 'Menlo'; }
 """
 
 
@@ -70,22 +76,27 @@ class SettingsDialog(QDialog):
     changed = Signal(dict)
     wipe_all = Signal()
     history_wiped = Signal()
+    voz_natural_mudou = Signal()          # instalou ou removeu a voz natural
+    voz_natural_vai_mudar = Signal()      # vai remover: o app fecha o motor antes
+    testar_meme = Signal(bool)            # botão de teste: ele traz um meme agora (True: a IA comenta)
 
     def __init__(self, perms, paths, first_run=True):
         """Tela de permissões e configurações. Trabalha numa cópia das permissões: cada mudança é avisada ao app na hora."""
         super().__init__()
         self.perms = dict(perms)           # cópia: só o app grava, pela transição certa
         self.paths = paths
+        self.first_run = first_run
         self.setWindowTitle(config.APP_NOME)
         self.setWindowIcon(face_icon())
         self.setStyleSheet(STYLE)
-        self.setMinimumWidth(460)
-        # cabe na tela: o conteúdo rola dentro da janela, e o botão de começar fica sempre visível
+        self.setMinimumWidth(500)
+        # cabe na tela: o conteúdo rola dentro da janela (só na vertical), e o botão de começar fica sempre visível
         screen = QApplication.primaryScreen().availableGeometry()
-        self.resize(500, min(760, int(screen.height() * 0.85)))
+        self.resize(min(580, screen.width()), min(780, int(screen.height() * 0.85)))
         outer = QVBoxLayout(self)
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setFrameShape(scroll.Shape.NoFrame)
         content = QWidget()
         content.setObjectName("conteudo")
@@ -164,6 +175,25 @@ class SettingsDialog(QDialog):
             if group_title == "Travessuras":
                 self.resumo = self._asset_summary()
                 layout.addWidget(self.resumo)
+                self._linha_teste_meme(layout)
+            if group_title == "Voz":
+                self._linha_repeticao(layout, perms)
+                row = QHBoxLayout()
+                self.voz_status = QLabel()
+                self.voz_status.setObjectName("hint")
+                self.voz_status.setWordWrap(True)
+                row.addWidget(self.voz_status, 1)
+                natural = QPushButton("Voz natural...")
+                natural.clicked.connect(self._abrir_voz_natural)
+                row.addWidget(natural)
+                layout.addLayout(row)
+                self._atualizar_voz_status()
+            if group_title.startswith("IA local"):
+                self.ia_status = QLabel(self._texto_ia_status())
+                self.ia_status.setObjectName("hint")
+                self.ia_status.setWordWrap(True)
+                self.ia_status.setTextInteractionFlags(Qt.TextSelectableByMouse)
+                layout.addWidget(self.ia_status)
             if group_title == "Rotina":
                 row = QHBoxLayout()
                 self.history_label = QLabel()
@@ -231,6 +261,36 @@ class SettingsDialog(QDialog):
         self.resumo.setText(f"Conteúdo de {nome}: {memes} memes de emoção, {trabalho} de trabalho, {photos} fotos, "
                             f"{len(notes.lines)} recadinhos e {len(tristes.lines)} bilhetes tristes.")
 
+    def _atualizar_voz_status(self):
+        """Linha que diz se a voz natural está instalada."""
+        if not plataforma.TEM_VOZ:
+            self.voz_status.setText("Neste sistema, o pet ainda não fala (por enquanto, só no macOS).")
+        elif voz_natural_instalada(self.paths.voz_natural):
+            self.voz_status.setText("Voz natural: instalada (cada pet fala com a voz dele).")
+        else:
+            self.voz_status.setText("Voz natural: não instalada (usa a voz do sistema). "
+                                    "Veja se o seu computador aguenta:")
+
+    def _texto_ia_status(self):
+        """Linha que diz se a IA local está instalada (e se enxerga)."""
+        pasta = self.paths.ia_local
+        if ia_local.visao_instalada(pasta):
+            return "IA local: instalada, com visão."
+        comando = "python -m pestinha.mind.ia_local --instalar"
+        if ia_local.instalada(pasta):
+            return f"IA local: instalada, sem a visão (para espiar a tela, rode de novo: {comando})."
+        return f"IA local: não instalada. Para instalar (uns 2 GB): {comando}"
+
+    def _abrir_voz_natural(self):
+        """Abre a tela que confere o computador e instala a voz natural."""
+        from .voz_natural import VozNaturalDialog
+        dialogo = VozNaturalDialog(self.paths, self)
+        dialogo.vai_mudar.connect(self.voz_natural_vai_mudar)
+        dialogo.mudou.connect(self.voz_natural_mudou)
+        dialogo.mudou.connect(self._atualizar_voz_status)
+        dialogo.exec()
+        self._atualizar_voz_status()
+
     def _update_history_label(self):
         """Mostra quantos minutos de rotina estão gravados."""
         minutes = timeline.count_rows(self.paths.timeline)
@@ -276,6 +336,72 @@ class SettingsDialog(QDialog):
         self._set("pet", self.pet_combo.currentData())
         self._atualizar_resumo()
 
+    def _linha_teste_meme(self, layout):
+        """Botões para testar: ele traz um meme agora (com a fala, se a voz estiver ligada)."""
+        linha = QHBoxLayout()
+        self.botao_meme = QPushButton("Testar meme")
+        self.botao_meme.setToolTip("Ele traz um meme agora. Com a voz ligada, fala uma reação já escrita.")
+        self.botao_meme.clicked.connect(lambda: self._pedir_teste(False))
+        linha.addWidget(self.botao_meme)
+        self.botao_meme_ia = QPushButton("Testar meme com IA")
+        self.botao_meme_ia.setToolTip("Ele traz um meme e a IA local olha a imagem e escreve o que ele fala. "
+                                      "Precisa da voz ligada e da IA local com visão.")
+        self.botao_meme_ia.clicked.connect(lambda: self._pedir_teste(True))
+        linha.addWidget(self.botao_meme_ia)
+        linha.addStretch(1)
+        layout.addLayout(linha)
+        for botao in (self.botao_meme, self.botao_meme_ia):
+            botao.setVisible(not self.first_run)        # na primeira tela o pet ainda não está aberto
+        self.teste_status = QLabel("")
+        self.teste_status.setObjectName("hint")
+        self.teste_status.setWordWrap(True)
+        self.teste_status.setVisible(False)
+        layout.addWidget(self.teste_status)
+
+    def _pedir_teste(self, com_ia):
+        """Clicou num botão de teste: o app traz o meme e responde com aviso_teste."""
+        self.aviso_teste("Pedindo o meme...")
+        self.testar_meme.emit(com_ia)
+
+    def aviso_teste(self, texto):
+        """Mostra o que aconteceu com o teste do meme."""
+        self.teste_status.setText(texto)
+        self.teste_status.setVisible(bool(texto))
+
+    def _linha_repeticao(self, layout, perms):
+        """Greve e revolução: quantas vezes ele repete a fala do cartaz e a pausa antes de cada repetição."""
+        self.rotulo_repetir = QLabel("Palavra de ordem (greve e revolução)")
+        self.rotulo_repetir.setContentsMargins(26, 2, 0, 0)
+        layout.addWidget(self.rotulo_repetir)
+        linha = QHBoxLayout()
+        linha.setContentsMargins(26, 0, 0, 0)
+        vezes_min, vezes_max = config.LIMITES_NUMERICOS["repetir_vezes"]
+        self.repetir_vezes = QSpinBox()
+        self.repetir_vezes.setRange(vezes_min, vezes_max)
+        self.repetir_vezes.setValue(int(perms["repetir_vezes"]))
+        self.repetir_vezes.setPrefix("repetir ")
+        self.repetir_vezes.setSuffix("x")
+        self.repetir_vezes.setSpecialValueText("não repetir")          # 0
+        self.repetir_vezes.valueChanged.connect(lambda v: self._set("repetir_vezes", int(v)))
+        linha.addWidget(self.repetir_vezes)
+        pausa_min, pausa_max = config.LIMITES_NUMERICOS["repetir_pausa_ms"]
+        self.repetir_pausa = QSpinBox()
+        self.repetir_pausa.setRange(pausa_min, pausa_max)
+        self.repetir_pausa.setSingleStep(100)
+        self.repetir_pausa.setPrefix("pausa de ")
+        self.repetir_pausa.setSuffix(" ms")
+        self.repetir_pausa.setValue(int(perms["repetir_pausa_ms"]))
+        self.repetir_pausa.valueChanged.connect(lambda v: self._set("repetir_pausa_ms", int(v)))
+        linha.addWidget(self.repetir_pausa)
+        linha.addStretch(1)
+        layout.addLayout(linha)
+        dica = QLabel("O cartaz da greve e o da revolução viram palavra de ordem: ele fala, espera a pausa e fala "
+                      "de novo. A pausa conta depois que a fala termina (1000 ms = 1 segundo).")
+        dica.setObjectName("hint")
+        dica.setWordWrap(True)
+        dica.setContentsMargins(26, 0, 0, 4)
+        layout.addWidget(dica)
+
     def _set(self, key, value):
         """Grava uma permissão e avisa o app só dessa mudança."""
         self.perms[key] = value
@@ -287,13 +413,28 @@ class SettingsDialog(QDialog):
         master = self.perms["travessuras"]
         for key in ("memes", "fotos", "bilhetes"):
             self.boxes[key].setEnabled(master)
+        for key in ("inventar", "ver_tela"):                   # as duas viram post-its
+            self.boxes[key].setEnabled(master and self.perms["bilhetes"])
         self.boxes["mostrar_emocao"].setEnabled(self.perms["modo_teste"])
+        self.boxes["paineis_teste"].setEnabled(self.perms["modo_teste"])
+        self.boxes["inicio_bolinha"].setEnabled(self.perms["bolinha"])
+        self.boxes["voz"].setEnabled(plataforma.TEM_VOZ)
+        falando = plataforma.TEM_VOZ and self.perms["voz"]
+        for controle in (self.rotulo_repetir, self.repetir_vezes):
+            controle.setEnabled(falando)
+        self.repetir_pausa.setEnabled(falando and self.perms["repetir_vezes"] > 0)
+        memes = master and self.perms["memes"] and self.perms["ativo"]
+        self.botao_meme.setEnabled(memes)
+        self.botao_meme_ia.setEnabled(memes and falando and self.perms["inventar"]
+                                      and ia_local.visao_instalada(self.paths.ia_local))
 
     def set_active(self, on):
         """Atualiza a caixa 'ligado' sem disparar a gravação (usado pelo pânico)."""
         self.active_box.blockSignals(True)
         self.active_box.setChecked(on)
         self.active_box.blockSignals(False)
+        self.perms["ativo"] = on
+        self._sync_enabled()
 
 
 class Tray(QObject):
@@ -303,7 +444,6 @@ class Tray(QObject):
     open_panel = Signal()
     toggle_floating = Signal()
     toggle_pause = Signal()
-    toggle_hidden = Signal()
     clear_things = Signal()
     panic = Signal()
     quit = Signal()
@@ -322,7 +462,6 @@ class Tray(QObject):
             ("panel", "Painel de protesto", self.open_panel),
             ("floating", "Esconder painéis de teste", self.toggle_floating),
             ("pause", "Pausar", self.toggle_pause),
-            ("hide", "Esconder", self.toggle_hidden),
             ("clear", "Limpar travessuras", self.clear_things),
             ("panic", f"Pânico ({config.PANIC_HOTKEY_TEXT})", self.panic),
             ("quit", "Sair", self.quit),
@@ -331,7 +470,7 @@ class Tray(QObject):
             action.triggered.connect(signal.emit)
             menu.addAction(action)
             self.actions[key] = action
-            if key in ("hide", "panic"):
+            if key in ("pause", "panic"):
                 menu.addSeparator()
         self.menu = menu
         self.icon.setContextMenu(menu)
@@ -340,10 +479,9 @@ class Tray(QObject):
         )
         self.icon.show()
 
-    def set_state(self, paused, hidden, test_mode):
-        """Atualiza os textos do menu e a dica do ícone conforme o estado (pausado, escondido, modo de teste)."""
+    def set_state(self, paused, test_mode):
+        """Atualiza os textos do menu e a dica do ícone conforme o estado (pausado, modo de teste)."""
         self.actions["pause"].setText("Continuar" if paused else "Pausar")
-        self.actions["hide"].setText("Mostrar" if hidden else "Esconder")
         self.icon.setToolTip(self.titulo + ("  [MODO TESTE]" if test_mode else ""))
 
 

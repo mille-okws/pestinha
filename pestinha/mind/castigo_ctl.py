@@ -9,10 +9,15 @@ dispara quando a frustração passa do limiar, e o WATCH e o ANGRY decidem se el
 você ou vira de costas. Cada fuga bem-sucedida fica salva e entra na rede como memória
 (LEMBRA_FUGA), que aumenta a excitação de FUGIR. Tudo é reversível: tirar o pet do canto
 ou desligar a opção no menu devolve ele à tela normal.
+
+Com a voz ligada, ele fala o cartaz. Com a voz natural, a fala é preparada antes e o cartaz
+aparece junto com ela (o cartaz anterior fica até lá). O xingamento é censurado: os símbolos
+viram "piii"; o que é só símbolo vira um resmungo (seção [resmungo] do cartazes.txt).
 """
 
 import math
 import random
+import re
 
 from PySide6.QtCore import QPointF, QRectF, Qt
 from PySide6.QtGui import QColor, QFont, QFontMetrics, QGuiApplication, QPainter, QPen
@@ -51,6 +56,21 @@ DISTANCIA_PLACA = 260.0       # px: carregado perto assim da placa, a pista da p
 DISTANCIA_AVISO = 500.0       # px: o aviso da placa (PLACA) é forte perto dela e some a esta distância
 CARTAZ_MIN_S = 8.0            # s mínimos com o mesmo cartaz antes de trocar
 MEMORIA_POR_FUGA = 0.2        # quanto cada fuga que deu certo aumenta a memória (LEMBRA_FUGA)
+BIPE = "piii"                 # o palavrão censurado, falado
+XINGAMENTO = re.compile(r"[@#$%&*][@#$%&*!]*")      # um palavrão em símbolos (o "!" do fim fica)
+
+
+def fala_do_cartaz(texto, resmungos):
+    """
+    O que ele fala com este cartaz: o texto; no xingamento, os símbolos viram "piii"
+    ("#@$%&... SINERGIA!" -> "piii... SINERGIA!"); só símbolos, um resmungo.
+    """
+    if not XINGAMENTO.search(texto):
+        return texto
+    censurado = XINGAMENTO.sub(BIPE, texto)
+    if re.search(r"[^\W\d_]", XINGAMENTO.sub("", texto)):     # sobrou alguma palavra
+        return censurado
+    return random.choice(resmungos) if resmungos else BIPE + "!"
 
 
 class PlaquinhaCanto(FloatingWidget):
@@ -127,6 +147,10 @@ class CastigoController:
         self.visivel = True           # o pet está na tela (a placa só aparece junto)
         self.entrada_pendente = None  # soltou no ar: espera o pouso para decidir (até quando vale)
         self.ultimo_topo = -1e9
+        # voz (o app liga): o cartaz fala ao aparecer; com a voz natural, a fala é preparada antes
+        self.ao_mostrar = None        # (fala, emoção) quando um cartaz aparece
+        self.preparar = None          # (fala, emoção, pronto, falhou, cancelado) -> True se vai preparar antes
+        self.esperando = None         # o cartaz que está sendo preparado (um por vez)
 
     @staticmethod
     def _fracao(data, chave):
@@ -336,23 +360,58 @@ class CastigoController:
             if self.debug():
                 log(f"[castigo] aceitou e saiu (ACEITAR {motores['ACEITAR']:.1f} Hz)")
             return
-        cartaz_novo = self.cartaz is None or now - self.cartaz_desde >= CARTAZ_MIN_S
+        cartaz_novo = (self.cartaz is None or now - self.cartaz_desde >= CARTAZ_MIN_S) and self.esperando is None
         if cartaz_novo and random.random() < motores.get("CARTAZ", 0.0) * GANHO_CARTAZ * dt:
-            self._soltar_cartaz()
             bravo = motores.get("ANGRY", 0.0) >= COSTAS_HZ
             textos = self.xingamentos if bravo and random.random() < 0.7 else self.cartazes + self.xingamentos[:2]
-            self.cartaz = SignThing(random.choice(textos), "castigo")
-            self._posicionar_cartaz(body)              # já nasce em cima dele
-            self.cartaz_desde = now
-            self.cartaz.show()
-            if self.debug():
-                log("[castigo] colou um cartaz")
+            texto = random.choice(textos)
+            xingou = texto in self.xingamentos
+            info = {"texto": texto, "fala": fala_do_cartaz(texto, self.resmungos),
+                    "emocao": "bravo" if bravo or xingou else "dramatico"}     # bravo xinga; quieto, faz drama
+            self._novo_cartaz(info, now, body)
         fugir = motores.get("FUGIR", 0.0)
         self.vontade_fuga = max(0.0, self.vontade_fuga + dt * (fugir - LIMIAR_FUGA_HZ) / CARGA_FUGA_HZ_S)
         if self.vontade_fuga >= 1.0:                   # vontade sustentada, não um pico
             if self.debug():
                 log(f"[castigo] tentou fugir (FUGIR {fugir:.1f} Hz, vontade cheia)")
             self._iniciar_fuga(now, bounds)
+
+    def _novo_cartaz(self, info, now, body):
+        """Um cartaz novo: com a voz natural, prepara a fala antes (o anterior fica até lá); senão, cola já."""
+        if self.preparar is not None and self.preparar(
+                info["fala"], info["emocao"],
+                lambda _frase: self._preparado(info),          # pronto, com o áudio
+                lambda _motivo: self._preparado(info),         # sem o áudio: cola assim mesmo
+                self._preparo_cancelado):
+            self.esperando = info
+            return
+        self._colar(info, now, body)
+
+    def _preparado(self, info):
+        """(Tela) A fala ficou pronta: cola o cartaz, se ele ainda está no canto. Senão, o áudio é descartado."""
+        if self.esperando is not info:
+            return False
+        self.esperando = None
+        if not self.dentro:
+            return False
+        self._colar(info, self.ultimo if self.ultimo is not None else 0.0, self.behavior.body)
+        return True
+
+    def _preparo_cancelado(self):
+        """A fila foi cancelada (pânico, voz desligada): ele pode preparar outro cartaz."""
+        self.esperando = None
+
+    def _colar(self, info, now, body):
+        """Troca o cartaz pelo novo, preso em cima dele, e fala."""
+        self._soltar_cartaz()
+        self.cartaz = SignThing(info["texto"], "castigo")
+        self._posicionar_cartaz(body)              # já nasce em cima dele
+        self.cartaz_desde = now
+        self.cartaz.show()
+        if self.debug():
+            log(f"[castigo] colou um cartaz: {info['texto']!r} (fala {info['fala']!r}, {info['emocao']})")
+        if self.ao_mostrar is not None:
+            self.ao_mostrar(info["fala"], info["emocao"])
 
     def _iniciar_fuga(self, now, bounds):
         """Começa uma fuga para o lado de dentro da tela; se der certo, o pet sai do canto."""
@@ -420,6 +479,11 @@ class CastigoController:
         """Frases de xingamento (símbolos) da seção [xingamento] do cartazes.txt do pet."""
         return tuple(load_signs(self.app.conteudo.signs)["xingamento"])
 
+    @property
+    def resmungos(self):
+        """O que ele fala quando o xingamento é só símbolos (seção [resmungo] do cartazes.txt)."""
+        return tuple(load_signs(self.app.conteudo.signs)["resmungo"])
+
     def _posicionar_cartaz(self, body):
         """Prende o cartaz no pet: o cartaz sempre fica em cima dele, acompanhando o movimento."""
         if self.cartaz is None:
@@ -441,6 +505,7 @@ class CastigoController:
         self.vontade_fuga = 0.0
         self.entrada_pendente = None
         self.punicao_ate = 0.0                       # saiu do canto: a recompensa negativa acaba junto
+        self.esperando = None                        # o cartaz que estava sendo preparado não aparece mais
         if state is not None:
             state.castigo = False
         self._soltar_cartaz()

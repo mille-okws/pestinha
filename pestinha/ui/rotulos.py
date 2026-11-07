@@ -65,6 +65,8 @@ MOTORES = {
     "CARTAZ": "colar cartaz",
     "CANTO": "ir para o cantinho",
     "TRAVESSURA": "aprontar",
+    "INVENTAR": "inventar frase",
+    "ESPIAR": "espiar a tela",
     "PAPEL": "atirar papel",
     "ACEITAR": "aceitar o castigo",
 }

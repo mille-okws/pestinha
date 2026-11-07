@@ -28,6 +28,7 @@ PLACA = {
     "castigo": (190, 86, 13), "xingamento": (190, 86, 13),
     "revolucao": (190, 106, 13),                      # a bandeira, na menor escala
 }
+SO_FALADAS = {"resmungo"}                             # seções que só viram fala, nunca placa
 LEGIVEL = 8
 
 
@@ -46,6 +47,8 @@ def medir(pet_id, paths=None):
     paths = paths or Paths(root=RAIZ)
     problemas = []
     for secao, textos in load_signs(paths.conteudo(pet_id).signs).items():
+        if secao in SO_FALADAS:
+            continue
         largura, altura, inicial = PLACA[secao]
         for texto in textos:
             size, cabe = tamanho_que_cabe(texto, largura, altura, inicial)

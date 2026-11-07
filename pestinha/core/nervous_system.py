@@ -138,6 +138,8 @@ MOTOR_SPEC = [
     ("TRAVESSURA", 10, 60.0, 0.030, 4.0),   # apronta uma travessura (a taxa vira a frequência)
     ("PAPEL",   10, 60.0, 0.030, 4.0),      # atira bolinha de papel (na revolução)
     ("ACEITAR", 10, 80.0, 0.020, 4.0),      # aceita o castigo e sai do canto por conta própria (perdão)
+    ("INVENTAR", 10, 80.0, 0.020, 4.0),     # escreve um post-it novo (IA local) em vez de um já escrito
+    ("ESPIAR",  10, 80.0, 0.030, 5.0),      # espia a tela e comenta (IA local com visão)
 ]
 
 # ============================================================
@@ -290,9 +292,23 @@ CONNECTIONS = [
     ("RECEIO",  "GLOOM",   0.04, 0.6),
     ("CARTAZ",  "FRUSTRATION", -0.20, 0.6), # 9) colar cartaz é desabafo
     ("BOREDOM", "FUGIR",   0.15, 0.6),      # 10) entediado no canto, foge do tédio
+
+    # ---- IA local: a rede decide quando inventar uma frase e quando espiar a tela ----
+    ("BOREDOM", "INVENTAR", 0.25, 0.6),     # entediado, inventa coisa nova
+    ("CURIOUS", "INVENTAR", 0.15, 0.6),
+    ("PLAYFUL", "INVENTAR", 0.12, 0.6),
+    ("TIRED",   "INVENTAR", -0.30, 0.5),    # cansado, repete o que já sabe
+    ("CALM",    "INVENTAR", -0.10, 0.5),
+    ("CURIOUS", "ESPIAR",  0.20, 0.6),      # curioso, quer ver o que você está fazendo
+    ("NOVELTY", "ESPIAR",  0.06, 0.6),
+    ("WEB",     "ESPIAR",  0.03, 0.6),
+    ("TIRED",   "ESPIAR", -0.40, 0.5),
+    ("GLOOM",   "ESPIAR", -0.40, 0.5),      # triste não fica espiando
+    ("PLACA",   "ESPIAR", -0.40, 0.6),      # de castigo, nem pensar
 ]
 
-DECISION_MOTORS = {"SENTAR", "FUGIR", "CARTAZ", "CANTO", "TRAVESSURA", "PAPEL", "ACEITAR"}   # decisões, não expressão
+DECISION_MOTORS = {"SENTAR", "FUGIR", "CARTAZ", "CANTO", "TRAVESSURA", "PAPEL", "ACEITAR", "ESPIAR"}   # decisões, não expressão
+MODULADORES = {"INVENTAR"}     # dizem COMO fazer (frase nova ou já escrita), não O QUE: não competem com ninguém
 LATERAL_INHIBITION = 0.05      # cada motor inibe os outros
 STARTLE_INHIBITION = 0.10      # o susto inibe mais forte
 
@@ -454,7 +470,8 @@ class LIFBrain(Brain):
         for a in motors:
             for b in motors:
                 # motores de expressão (corpo) e de decisão (sentar, fugir...) competem só dentro do seu grupo
-                if a != b and (a in DECISION_MOTORS) == (b in DECISION_MOTORS):
+                if a != b and a not in MODULADORES and b not in MODULADORES \
+                        and (a in DECISION_MOTORS) == (b in DECISION_MOTORS):
                     connect(a, b, -(STARTLE_INHIBITION if a == "STARTLE" else LATERAL_INHIBITION), 0.7)
 
         self.W = W

@@ -1,0 +1,10 @@
+# O que o Jorge fala quando traz um meme ou uma foto (só com a voz ligada). Uma fala por linha.
+# É sátira: ele não vende, cobra nem pede nada de verdade.
+# Pode editar com ele rodando: ele relê o arquivo sozinho.
+OLHA ESSE CONTEÚDO DE VALOR!
+ISSO AQUI É MINDSET PURO!
+SALVA ESSE, É ESTRATÉGIA!
+TROUXE UM INSIGHT PARA VOCÊ!
+ESSE MEME FATURA SOZINHO!
+ISSO É O QUE OS POBRES NÃO VEEM!
+COMPARTILHA COM A SUA REDE!

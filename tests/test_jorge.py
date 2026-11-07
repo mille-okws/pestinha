@@ -87,7 +87,7 @@ def test_nada_exclusivo_de_um_aparece_no_outro():
     assert em_comum <= neutras, em_comum - neutras
     textos = " ".join(frases("jorge")).upper()
     for marca in ("BRYAN", "ABAIXO O CURSOR", "A RAM É DE QUEM USA", "ABAIXO O GERENCIADOR", "ABAIXO O ALT+F4",
-                  "CURSOR, RESPEITA", "470 NEURÔNIOS"):
+                  "CURSOR, RESPEITA", "490 NEURÔNIOS"):
         assert marca not in textos, marca
     textos_bryan = " ".join(frases("bryan")).upper()
     for marca in ("JORGE", "MENTORIA", "MINDSET", "JORGECOIN"):

@@ -8,8 +8,14 @@ Mixin de PestinhaApp: usa os atributos criados em PestinhaApp.__init__.
 """
 
 from ..log import log
+import random
 import time
-from PySide6.QtWidgets import QMenu
+from PySide6.QtCore import QUrl
+from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QMenu, QSystemTrayIcon
+from .. import config, plataforma
+from ..mind import frases_ia
+from ..mind.fala_ctl import arquivo_do_print
 from ..body.pet import cursor_pos
 from ..ajustes import (
     INSATISFACAO_NOTEBOOK,
@@ -92,6 +98,8 @@ class InteracaoMixin:
 
     def on_dismissed(self, thing, elapsed):
         """Você dispensou uma travessura: ela some, e o tempo até você fechar vira aprendizado (fechar rápido é pior)."""
+        if getattr(thing, "fala", None):
+            self.voz.parar(thing.fala)               # fechou o post-it (ou meme) que ele estava falando: ele para
         if self._congelado():
             return                                   # o objeto some, mas não vira aprendizado na pausa
         self.mischief_ctl.on_dismissed(thing, elapsed, self.prof, time.monotonic())
@@ -127,14 +135,29 @@ class InteracaoMixin:
         item("Mostrar o notebook" if self.mesa.escondido else "Esconder o notebook",
              self.menu_alternar_notebook)
         item("Fazer uma travessura agora", self.menu_mischief, perms["travessuras"])
+        pode_bilhete = perms["travessuras"] and perms["bilhetes"]
+        if self.fala.ocupado():
+            fila = self.preparo.rotulos()
+            item(f"Preparando: {fila[0]}..." if fila else "Preparando...", lambda: None, False)
+        elif self.fala.ia():
+            item("Escrever o que está sentindo (IA)", self.menu_frase_ia, pode_bilhete)
+            if self.fala.visao():
+                item("Espiar a tela e comentar (IA)", self.menu_espiar, pode_bilhete)
+        if self.debugging() and self.paths.ultima_espiada.exists():
+            item("Ver o último print (teste)", self.menu_ver_print)
+        else:
+            item("Escrever o que está sentindo (IA não instalada)", lambda: None, False)
         menu.addSeparator()
         item("Cantinho do castigo", lambda: self.castigo.toggle(self.bounds()))
-        item("Painel de protesto", lambda: self.floats.toggle("greve"))
-        item("Monitor neural", lambda: self.floats.toggle("neural"))
+        for chave, nome in (("greve", "painel de protesto"), ("neural", "monitor neural")):
+            # o painel fica atrás quando você usa outro programa: clicar traz para a frente
+            # *_: o triggered do Qt manda o `checked` como primeiro argumento
+            item(nome[0].upper() + nome[1:], lambda *_, k=chave: self.floats.open(k))
+            if chave in self.floats.opened or self.floats.aberto(chave):
+                item(f"Fechar o {nome}", lambda *_, k=chave: self.floats.close(k))
         item("Configurações...", self.open_settings)
         menu.addSeparator()
-        item("Esconder (volta pela bandeja)", self.toggle_hidden)
-        item("Fechar", self.menu_close)
+        item("Sair", self.quit)                 # fecha o programa (igual ao Sair da bandeja)
         menu.exec(pos)
 
     def menu_poke(self):
@@ -173,6 +196,148 @@ class InteracaoMixin:
     def menu_mischief(self):
         """Menu: 'Aprontar' (pede uma travessura agora)."""
         self.mischief_ctl.pedir(time.monotonic())
+
+    # ---------------- IA local e fala preparada (em teste) ----------------
+
+    def estado_para_ia(self):
+        """O que a rede sente agora, do jeito que entra no pedido da IA (só a categoria do programa)."""
+        sentidos = self.drives.channels()
+        return {"emocao": self.pet_state.emotion, "cansaco": sentidos["FATIGUE"],
+                "carencia": sentidos["LONELY"], "tedio": sentidos["BOREDOM"], "atividade": self.activity,
+                "protesto": self.protest.stage, "hora": time.localtime().tm_hour}
+
+    def escritor_ia(self, emocao=None, acao="bilhete"):
+        """Monta (na tela) o pedido de uma frase nova; a fila do preparo é quem escreve."""
+        triste = acao == "bilhete_triste" or (emocao or self.pet_state.emotion) == "triste"
+        notas = self.mischief.notes_sad if triste else self.mischief.notes
+        notas.has_lines()                                       # relê o arquivo se mudou
+        exemplos = random.sample(notas.lines, min(frases_ia.EXEMPLOS, len(notas.lines)))
+        return self.fala.escritor(self.nome, self.personalidade, self.estado_para_ia(), exemplos,
+                                  evitar=notas.lines)
+
+    def _pode_entregar(self, acao="bilhete"):
+        """Algo preparado (post-it, meme, foto) ainda pode aparecer: não desligaram, esconderam nem pausaram no meio."""
+        perms = self.perms
+        permissao = "fotos" if acao == "foto" else "memes" if acao.startswith("meme") else "bilhetes"
+        return (perms["ativo"] and perms["travessuras"] and perms[permissao] and self.pet.isVisible()
+                and not self._congelado() and not self.castigo.dentro)
+
+    def _pode_entregar_bilhete(self):
+        """Um post-it preparado ainda pode aparecer."""
+        return self._pode_entregar("bilhete")
+
+    def testar_meme(self, com_ia=False):
+        """Configurações: traz um meme agora, para testar (com a fala, se a voz estiver ligada)."""
+        if not self.pet.isVisible() or self._congelado():
+            aviso = f"{self.nome} está escondido ou pausado."
+        elif self.asleep:
+            aviso = f"{self.nome} está dormindo."
+        elif self.castigo.dentro:
+            aviso = f"{self.nome} está de castigo."
+        elif self.mischief_ctl.pendente is not None or self.preparo.ocupado():
+            aviso = f"{self.nome} já está preparando outra coisa. Tente de novo daqui a pouco."
+        else:
+            now, bounds, cursor = self._cena()
+            aviso = self.mischief_ctl.testar_meme(self.pet_state.emotion, now, bounds, cursor, com_ia)
+        log(f"[teste] meme{' com IA' if com_ia else ''}: {aviso}")
+        if self.settings is not None:
+            self.settings.aviso_teste(aviso)
+        return aviso
+
+    def comentador_de_imagem(self, emocao, imagem):
+        """Monta (na tela) o pedido para a IA comentar o meme ou foto que ele vai trazer."""
+        return self.fala.comentador(self.nome, self.personalidade, self.estado_para_ia(), copiar_de=imagem)
+
+    def _cena(self):
+        """(agora, área da tela, cursor) na hora em que algo preparado aparece."""
+        return time.monotonic(), self.bounds(), cursor_pos()
+
+    def _preparar_cartaz(self, rotulo, emocao, texto, pronto, falhou, cancelado):
+        """Cartaz novo: com a voz natural, gera a fala antes (o cartaz espera); sem ela, False (aparece já)."""
+        if not self.fala.precisa_preparar(texto=texto) or not self.pet.isVisible() or self._congelado():
+            return False                                        # "@#$%!" não tem o que falar: aparece já
+        return self.fala.preparar(rotulo, pronto, texto=texto, emocao=emocao,
+                                  ao_falhar=falhou, ao_cancelar=cancelado)
+
+    def _bilhete_ia(self, rotulo, escrever, ao_cancelar=None):
+        """Põe na fila: a IA escreve, a voz gera, e o post-it aparece (pedido pelo menu ou pela vontade de espiar)."""
+        def mostrar(frase):
+            if not self._pode_entregar_bilhete():
+                log(f"[preparo] {rotulo}: ficou pronto, mas agora não pode aparecer")
+                return False
+            now, bounds, cursor = self._cena()
+            if self.mischief_ctl.mostrar_bilhete(frase, now, bounds, cursor, andar=not self.asleep) is None:
+                log(f"[preparo] {rotulo}: não achou lugar para o post-it")
+                return False
+            return True
+
+        def falhou(motivo):
+            self.tray.icon.showMessage(config.APP_NOME, f"{self.nome} não conseguiu escrever agora ({motivo}).",
+                                       QSystemTrayIcon.Information, 4000)
+        if not self.fala.preparar(rotulo, mostrar, escrever=escrever, emocao=self.pet_state.emotion,
+                                  ao_falhar=falhou, ao_cancelar=ao_cancelar):
+            if ao_cancelar is not None:
+                ao_cancelar()
+            log(f"[preparo] {rotulo}: a fila está cheia")
+            return False
+        return True
+
+    def menu_frase_ia(self):
+        """Menu: 'Escrever o que está sentindo (IA)'. A rede diz o que ele sente; a IA local escreve."""
+        self._bilhete_ia("frase pedida no menu", self.escritor_ia())
+
+    # ---------------- espiar a tela (IA local com visão, em teste) ----------------
+
+    def pode_espiar(self):
+        """As regras para espiar sozinho: permissões, visão instalada, o sistema deixa, e ele está livre."""
+        perms = self.perms
+        return (perms["ver_tela"] and perms["ativo"] and perms["travessuras"] and perms["bilhetes"]
+                and not self.fullscreen and not self.asleep and self.protest.stage < 3 and self.sad.stage < 2
+                and self.pet.isVisible() and not self._congelado() and not self.castigo.dentro
+                and self.fala.visao() and plataforma.permissao_tela())
+
+    def maybe_espiar(self, now, dt, motores):
+        """O neurônio ESPIAR decide quando; aqui só as regras (e uma coisa por vez na fila)."""
+        if not self.perms["ver_tela"] or self.fala.ocupado() or self.mischief_ctl.pendente is not None:
+            return
+        if not self.espiar.quer(now, dt, motores["ESPIAR"]) or not self.pode_espiar():
+            return
+        self.espiar.espiou(now)
+        if self.debugging():
+            log(f"[espiar] ESPIAR {motores['ESPIAR']:.1f} Hz: vai espiar a tela")
+        self.espiar_agora("espiada na tela")
+
+    def menu_espiar(self):
+        """Menu: 'Espiar a tela e comentar (IA)'. Clicar é pedir: vale mesmo com o espiar sozinho desligado."""
+        if not plataforma.permissao_tela():
+            plataforma.pedir_permissao_tela()           # abre a pergunta do sistema (macOS), uma vez
+            self.tray.icon.showMessage(
+                config.APP_NOME, f"Para {self.nome} espiar a tela, permita a Gravação de Tela para este programa "
+                "(Ajustes do Sistema > Privacidade e Segurança > Gravação de Tela). Depois, feche e abra de novo "
+                "o programa (rodando pelo código, o Terminal): o macOS só vale a permissão ao reabrir.",
+                QSystemTrayIcon.Information, 8000)
+            return
+        self.espiar.espiou(time.monotonic())
+        self.espiar_agora("espiada pedida no menu")
+
+    def menu_ver_print(self):
+        """Menu (Modo teste): abre a cópia do último print que a IA olhou, no visualizador do sistema."""
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.paths.ultima_espiada)))
+
+    def espiar_agora(self, rotulo):
+        """Tira o print (no macOS, na fila; nos outros, aqui na tela), e a IA comenta. O print é apagado depois."""
+        estado = self.estado_para_ia()
+        if plataforma.CAPTURA_EM_QUALQUER_THREAD:
+            escrever = self.fala.comentador(self.nome, self.personalidade, estado, capturar=plataforma.capturar_tela)
+            return self._bilhete_ia(rotulo, escrever)
+        destino = arquivo_do_print()
+        apagar = lambda: destino.unlink(missing_ok=True)       # noqa: E731
+        if not plataforma.capturar_tela(destino):
+            apagar()
+            log(f"[espiar] {rotulo}: não conseguiu tirar o print")
+            return False
+        return self._bilhete_ia(rotulo, self.fala.comentador(self.nome, self.personalidade, estado, imagem=destino),
+                                ao_cancelar=apagar)
 
     def menu_alternar_notebook(self):
         """Menu: mostra ou esconde o notebook; sem o notebook, ele não pode sentar nele."""

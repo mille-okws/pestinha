@@ -1,9 +1,9 @@
 """
 FLOATS - os painéis flutuantes (monitor neural e painel de protesto).
 
-Modo teste: ficam sempre na tela, arrastáveis. Fora dele, só aparecem quando você
-abre pelo menu ou pela bandeja, e ficam até você fechar de novo (ou esconder o pet).
-A bandeja pode esconder ou mostrar; o tamanho e a posição ficam salvos (paths.panels).
+Só aparecem quando você abre pelo menu ou pela bandeja, e ficam até você fechar de novo (ou o pet sair da
+tela: desligado ou em tela cheia). No modo teste com "Abrir os painéis no modo teste" ligado, abrem sozinhos, e dá para fechar pelo menu.
+A bandeja pode esconder ou mostrar os painéis; o tamanho e a posição ficam salvos (paths.panels).
 """
 
 from PySide6.QtGui import QGuiApplication
@@ -21,6 +21,7 @@ class FloatManager:
         self.app = app
         self.windows = {}
         self.opened = set()             # painéis que você abriu à mão (menu ou bandeja)
+        self.fechados = set()           # automáticos (modo teste) que você fechou pelo menu
         self.hidden_by_tray = False
 
     def window(self, key):
@@ -40,7 +41,8 @@ class FloatManager:
         """
         for key in KEYS:
             # abertos à mão aparecem sempre; os automáticos (modo teste) obedecem à bandeja
-            shown = base and (key in self.opened or (automatic and not self.hidden_by_tray))
+            shown = base and (key in self.opened
+                              or (automatic and not self.hidden_by_tray and key not in self.fechados))
             if shown:
                 self.window(key).show()
             elif key in self.windows:
@@ -51,19 +53,23 @@ class FloatManager:
         if not self.app.floats_base():          # desligado, escondido ou tela cheia: não abre
             return
         self.opened.add(key)
-        w = self.window(key)
-        w.show()
-        w.raise_()
+        self.fechados.discard(key)
+        self.window(key).trazer_para_frente()      # aberto e atrás de outro programa: vem para a frente
 
     def close(self, key):
-        """Fecha um painel e o esquece da lista de abertos."""
+        """Fecha um painel e o esquece da lista de abertos (o automático do modo teste também fecha)."""
         self.opened.discard(key)
+        self.fechados.add(key)
         if key in self.windows:
             self.windows[key].hide()
 
+    def aberto(self, key):
+        """O painel está na tela agora (aberto à mão ou pelo modo teste)."""
+        return key in self.windows and self.windows[key].isVisible()
+
     def toggle(self, key):
         """Abre o painel se estiver fechado; fecha se estiver aberto."""
-        if key in self.opened:
+        if key in self.opened or self.aberto(key):
             self.close(key)
         else:
             self.open(key)

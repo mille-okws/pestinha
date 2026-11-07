@@ -98,7 +98,7 @@ def test_03_sair_continua_se_condicionamento_nao_puder_salvar(audit_buddy, monke
 
 def test_04_fim_de_tristeza_nao_mostra_cartaz_quando_oculto(audit_buddy):
     b = audit_buddy
-    b.hidden = True
+    b.fullscreen = True                      # tela cheia: o pet sai da tela
     b.update_visibility()
     b.sad.stage = 0
     b.sad_ctl.on_stage(1, 0)
