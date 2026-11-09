@@ -9,4 +9,4 @@ Mixins de `PestinhaApp`: sessão (permissões, visibilidade, pausa, pânico, sal
 | Arquivo | O que faz |
 |---|---|
 | `interacao.py` | O que você faz com o pet: cutucar, arrastar, arremessar, dispensar travessuras, os comandos do menu do botão direito e o notebook. |
-| `sessao.py` | O que vale para a sessão inteira: permissões, visibilidade, pausa, pânico, esconder, salvar, sair e apagar os dados. |
+| `sessao.py` | O que vale para a sessão inteira: permissões, visibilidade, pausa, pânico, salvar, sair e apagar os dados. |

@@ -1,5 +1,100 @@
 # Histórico de versões
 
+## Sem enxurrada de avisos do perfil de cor no terminal
+
+- Com um monitor cujo perfil de cor não tem nome (o macOS gera alguns assim), o Qt escrevia
+  `qt.gui.icc: fromIccProfile: Failed to parse description` a cada redesenho de uma janela nesse monitor,
+  e o terminal enchia enquanto o pet estava lá. As cores sempre ficaram certas: o aviso agora fica desligado.
+  Para ver de novo, rode com `QT_LOGGING_RULES=qt.gui.icc.warning=true`.
+
+## Fala preparada antes, frases escolhidas pela rede e espiar a tela (em teste)
+
+- **A fala é gerada antes de o post-it ou cartaz aparecer.** Com a voz natural, uma fila prepara tudo antes:
+  o motor da voz abre, carrega o modelo, gera o áudio e fecha; só então o post-it (ou cartaz) aparece, já com o
+  áudio, e o arquivo é apagado quando termina de tocar. O modelo da voz não fica mais carregado o tempo todo
+  e nenhuma fala fica guardada (acabou o cache em `memory/voz/<pet>/`).
+- **Frase com IA + voz, um modelo por vez:** a IA local escreve e fecha, a voz gera e fecha, e o post-it
+  aparece com o áudio. A IA e a voz nunca ficam na memória juntas (conferido no macOS: até 2,2 GB da IA e
+  3,4 GB da voz, nunca ao mesmo tempo).
+- **A rede escolhe frase nova ou já escrita:** novo neurônio motor `INVENTAR` (um modulador, que não compete
+  com as decisões). A taxa dele vira a chance de a IA escrever uma frase nova, em vez de uma de
+  `recadinhos.txt`. A memória registra as frases inventadas como `bilhete_ia`. Opção **Inventar frases novas**
+  (ligada por padrão, só vale com a IA local instalada).
+- **Espiar a tela (em teste):** o Qwen3.5-2B enxerga imagens. Com a parte da visão (`mmproj-F16.gguf`, 0,7 GB,
+  agora baixada pelo instalador), o pet tira um print da tela, a IA comenta, o print é apagado e o comentário
+  vira um post-it. Quem decide quando é o novo neurônio de decisão `ESPIAR` (curioso e com novidade na tela),
+  no máximo uma vez a cada 10 minutos. Opção **Espiar a tela e comentar**, desligada por padrão; também pelo
+  menu do pet. No macOS, pede a permissão de Gravação de Tela só quando você liga a opção ou usa o menu.
+- A rede passa de 470 para 490 neurônios (17 populações motoras).
+- O menu do pet mostra **Preparando...** enquanto algo está na fila. Pânico, fechar e remover a voz natural
+  cancelam a fila e apagam os áudios.
+- Removido o `QProcess` das frases com IA: a fila roda os programas numa thread só, com `subprocess`.
+- **Só a cena fica na frente de tudo:** o pet, a bolinha, o notebook, os fogos, os post-its, memes e cartazes e
+  a plaquinha do castigo. O monitor neural e o painel de protesto ficam no nível normal: quando você usa outro
+  programa, ele fica por cima deles (no macOS, sem sumir da tela). No menu do pet, o painel vem para a frente,
+  e **Fechar o monitor neural** / **Fechar o painel de protesto** fecha.
+- **Memes e fotos falam** (com a voz ligada): uma fala de `pets/<pet>/falas_memes.txt` (novo, para o Bryan e o
+  Jorge) ou, quando a rede quer inventar e a IA local enxerga, um comentário da IA sobre a própria imagem (ela olha
+  uma cópia; o meme fica intacto). Com a voz natural, o meme espera a fala, como os post-its.
+- **Testar meme** e **Testar meme com IA** (Configurações > Travessuras): ele traz um meme na hora, com a fala, e
+  a tela diz o que está acontecendo. Não conta como travessura para a rede aprender.
+- **Greve e revolução como palavra de ordem:** o cartaz é falado uma vez, sem pressa e mais alto, e repetido
+  depois de meio segundo (o mesmo áudio). Quantas vezes repete (0 a 5) e a pausa, em milissegundos (0 a 10.000),
+  ficam em Configurações > Voz. Se o cartaz sair antes, ele não repete. Os outros cartazes de protesto saem
+  bravos, com exclamação. O trabalhador da voz aceita `volume` no pedido.
+- **O cantinho do castigo fala:** o cartaz é falado com drama (ou bravo, com raiva), com a fala preparada antes,
+  como os outros cartazes. O xingamento é censurado: os símbolos viram "piii", e o que é só símbolo vira um
+  resmungo da seção nova `[resmungo]` do `cartazes.txt` (escrita para o Bryan e o Jorge).
+- **Frases da IA sem emoji:** o pedido já dizia "sem emoji", mas o modelo às vezes punha; agora eles são tirados.
+- **Configurações > Ao abrir:** **Começar com o notebook na tela** e **Começar com a bolinha na tela** (os dois
+  ligados por padrão).
+- **Configurações:** a janela ficou mais larga e sem rolagem para os lados.
+- **Sem "Esconder":** saiu o Esconder/Mostrar da bandeja e o "Esconder (volta pela bandeja)" do menu do pet, que
+  podiam deixar o pet sumido. O "Fechar" do menu do pet, que também só escondia, virou **Sair** e fecha o programa,
+  igual ao Sair da bandeja.
+- **Modo teste:** o monitor neural e o painel de protesto não abrem mais sozinhos; abrem pelo menu ou pela
+  bandeja. Quem quiser o jeito antigo liga **Abrir os painéis no modo teste** (desligado por padrão); abertos
+  assim, agora dá para fechar pelo menu.
+- **Modo teste:** o último print que a IA olhou fica em `memory/logs/ultima_espiada.png` (e em **Ver o último
+  print (teste)** no menu), para conferir a captura. Some ao desligar o Modo teste.
+
+## Frases com IA (em teste)
+
+- Novo item **Escrever o que está sentindo (IA)** no menu do pet: ele escreve um post-it novo sobre o que
+  sente, com o Qwen3.5-2B rodando no computador pelo llama.cpp. A rede neural decide o que ele sente
+  (emoção, cansaço, carência, tédio, protesto); o modelo só escreve.
+- Instalação pelo terminal: `python -m pestinha.mind.ia_local --instalar`. Baixa o llama.cpp pronto e o modelo
+  para `ia_local/`, com versão fixa e sha256 conferida, sem instalar nada no sistema nem no Python.
+- Cada frase abre o llama.cpp, gera e fecha (cerca de 1 s no macOS com Apple Silicon), então o modelo não fica
+  na memória. Respostas ruins são descartadas, e ele tenta de novo até 3 vezes.
+- Novo campo `personalidade` no `pets/<pet>.json`, usado no pedido ao modelo.
+
+## Voz: o pet lê os post-its e os cartazes
+
+- Nova opção **Falar os bilhetes e cartazes** (macOS, desligada por padrão). O pet lê em voz alta cada
+  post-it e cada cartaz que aparece. Uma frase nova interrompe a anterior, e fechar o post-it cala a fala.
+- **Voz natural** com o [OmniVoice](https://github.com/k2-fsa/OmniVoice), rodando no computador. Cada pet fala
+  com a voz dele e com a emoção da hora, em forma de risada, resmungo, suspiro ou susto e da velocidade.
+  Os cartazes de protesto saem bravos e os de abandono, tristes.
+- Tela **Voz natural...** em Configurações: confere se o computador aguenta (macOS 13+, Apple Silicon,
+  memória, disco, Python), explica o que vai ser baixado (uns 4,5 GB), instala mostrando o andamento e
+  remove. Também pelo terminal: `python -m pestinha.mind.voz_instalacao [--instalar | --remover]`.
+- O motor fica num ambiente Python separado (`voz_natural/`), num processo à parte. O Pestinha não passa a
+  depender do PyTorch, e o pet não trava enquanto a fala é gerada. As falas geradas ficam em
+  `memory/voz/<pet>/` e tocam na hora da segunda vez.
+- Bryan e Jorge vêm com a voz deles em `pets/<pet>/voz/referencia.wav`. Para trocar a voz, troque esse
+  arquivo e o `referencia.txt`, como explica o README.
+- Sem a voz natural (ou se ela falhar), o pet usa a voz do sistema (`say`), escolhida no campo `voz` do
+  `pets/<pet>.json`.
+
+## macOS: o pet fica na frente de tudo
+
+- O pet, a bolinha e os painéis sumiam ao clicar em outro programa: o `Qt.Tool` vira um `NSPanel` com
+  `hidesOnDeactivate`. Agora ficam na tela, em todos os Spaces e sobre programas em tela cheia.
+- Clicar no pet não ativa mais o programa, como já acontecia no Windows. As Configurações pedem o foco ao abrir.
+- Testes no macOS com janelas reais (`tests/test_macos_real.py`), também no CI: as janelas do pet continuam na tela
+  quando outro programa ganha o foco, o atalho de pânico registra e as leituras do sistema têm o formato certo.
+
 ## 0.8.0 — melhorias para o Windows
 
 ### Correções

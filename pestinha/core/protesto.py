@@ -32,6 +32,7 @@ DEFAULT_SIGNS = {
     "revolucao": ["CHEGA!", "!!!!"],
     "castigo": ["ISSO NÃO É JUSTO.", "EU SÓ QUERIA BRINCAR."],      # no cantinho do castigo
     "xingamento": ["@#$%@!!!!", "%&#@*!!", "#@$%&!!!"],              # no cantinho, com raiva
+    "resmungo": ["argh!", "que raiva!", "isso é um absurdo!"],        # o que ele FALA no xingamento só de símbolos
     "acordo": ["ACORDO FECHADO"],
     "desistiu": ["...tá. passou."],
     # tristeza (a versão "greve" do sentimento triste)

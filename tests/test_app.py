@@ -6,6 +6,7 @@ tmp_path. Rodar (na pasta v7):  python -m pytest tests -q
 """
 
 import os
+import struct
 import sys
 from pathlib import Path
 
@@ -14,15 +15,15 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 import pytest  # noqa: E402
-from PySide6.QtCore import QPointF, Qt  # noqa: E402
-from PySide6.QtGui import QMouseEvent  # noqa: E402
+from PySide6.QtCore import QByteArray, QLoggingCategory, QPointF, Qt, qInstallMessageHandler  # noqa: E402
+from PySide6.QtGui import QColorSpace, QMouseEvent  # noqa: E402
 from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from pestinha import config  # noqa: E402
 from pestinha.app import PestinhaApp  # noqa: E402
 from pestinha.paths import Paths  # noqa: E402
 from pestinha.settings_store import SettingsStore  # noqa: E402
-from main import apagar_memoria  # noqa: E402
+from main import apagar_memoria, calar_aviso_do_perfil_de_cor  # noqa: E402
 
 
 @pytest.fixture(scope="session")
@@ -91,6 +92,8 @@ def test_apagar_memoria_informa_falha_sem_fingir_sucesso(tmp_path, monkeypatch):
 
 def test_modo_teste_mostra_os_paineis(buddy):
     buddy.apply_perms(dict(buddy.perms, modo_teste=True, ativo=True))
+    assert not buddy.floats.aberto("neural") and not buddy.floats.aberto("greve")   # padrão: só pelo menu
+    buddy.apply_perms(dict(buddy.perms, paineis_teste=True))
     assert buddy.floats.windows.get("neural") is not None
     assert buddy.floats.windows["neural"].isVisible()
     assert buddy.floats.windows["greve"].isVisible()
@@ -99,7 +102,7 @@ def test_modo_teste_mostra_os_paineis(buddy):
 
 
 def test_painel_arrastado_salva_a_posicao(buddy, tmp_path):
-    buddy.apply_perms(dict(buddy.perms, modo_teste=True, ativo=True))
+    buddy.apply_perms(dict(buddy.perms, modo_teste=True, paineis_teste=True, ativo=True))
     w = buddy.floats.windows["greve"]
     start = QPointF(w.mapToGlobal(w.rect().center()))
     end = start + QPointF(-120, 80)
@@ -117,7 +120,7 @@ def test_painel_arrastado_salva_a_posicao(buddy, tmp_path):
 
 
 def test_painel_nao_entra_na_lista_de_pouso(buddy):
-    buddy.apply_perms(dict(buddy.perms, modo_teste=True, ativo=True))
+    buddy.apply_perms(dict(buddy.perms, modo_teste=True, paineis_teste=True, ativo=True))
     buddy.floats.windows["greve"].move(100, 100)
     buddy.floats.windows["neural"].move(100, 500)
     handles = {int(w.winId()) for w in buddy.floats.windows.values()}
@@ -178,3 +181,34 @@ def test_cutucada_habitua_na_rede(buddy):
         buddy.brain.stimulate({"POKE": 0.8})
         buddy.brain.step(100)
     assert buddy.brain.efficacy()["POKE"] < before
+
+
+def perfil_de_cor_sem_nome():
+    """Perfil sRGB com o nome ('desc') vazio, como o que o macOS gera para alguns monitores."""
+    dados = bytearray(QColorSpace(QColorSpace.SRgb).iccProfile().data())
+    for i in range(struct.unpack(">I", dados[128:132])[0]):
+        entrada = 132 + 12 * i
+        tag, inicio, _ = struct.unpack(">4sII", dados[entrada:entrada + 12])
+        if tag == b"desc":
+            dados[inicio:inicio + 16] = b"mluc" + bytes(4) + struct.pack(">II", 0, 12)    # nenhum texto
+            dados[entrada + 8:entrada + 12] = struct.pack(">I", 16)
+    return QByteArray(bytes(dados))
+
+
+def test_monitor_com_perfil_de_cor_sem_nome_nao_enche_o_terminal(qapp, monkeypatch):
+    monkeypatch.delenv("QT_LOGGING_RULES", raising=False)
+    perfil = perfil_de_cor_sem_nome()
+    avisos = []
+    anterior = qInstallMessageHandler(lambda tipo, contexto, texto: avisos.append(texto))
+    try:
+        QLoggingCategory.setFilterRules("")
+        QColorSpace.fromIccProfile(perfil)
+        assert avisos == ["fromIccProfile: Failed to parse description"]     # o Qt avisa a cada leitura do perfil
+
+        calar_aviso_do_perfil_de_cor()
+        avisos.clear()
+        assert QColorSpace.fromIccProfile(perfil).isValid()                  # o perfil vale, as cores ficam certas
+        assert avisos == []
+    finally:
+        qInstallMessageHandler(anterior)
+        QLoggingCategory.setFilterRules("")

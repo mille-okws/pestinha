@@ -271,7 +271,7 @@ def scenario_session(s, i, monkeypatch):
     enter(s, time.monotonic())
     if i == 0: b.panic()
     if i == 1:
-        b.hidden = True
+        b.fullscreen = True
         b.update_visibility()
     if i == 2:
         b.fullscreen = True
@@ -287,9 +287,9 @@ def scenario_session(s, i, monkeypatch):
         b.toggle_pause()
         return result([b.paused, s.c.dentro], [False, True])
     if i == 6:
-        b.hidden = True
+        b.fullscreen = True
         b.update_visibility()
-        b.hidden = False
+        b.fullscreen = False
         b.update_visibility()
         return result([s.c.dentro, s.c.plaquinha.isVisible()], [False, True])
     if i == 7: s.c.toggle(BOUNDS)
@@ -336,7 +336,7 @@ def scenario_neural(s, i, monkeypatch):
         s.c._checar_fuga(time.monotonic() + 1, s.body)
     if i == 9:
         enter(s, time.monotonic())
-        b.hidden = True
+        b.fullscreen = True
         b.update_visibility()
     b.think()
     if i in (0, 1, 2, 9):

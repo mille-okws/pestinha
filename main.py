@@ -14,7 +14,7 @@ import argparse
 import hashlib
 import sys
 
-from PySide6.QtCore import QDir, QLockFile, QTimer
+from PySide6.QtCore import QDir, QLockFile, QLoggingCategory, QTimer
 from PySide6.QtWidgets import QApplication, QDialog, QMessageBox
 
 from pestinha import config, store
@@ -44,6 +44,16 @@ def travar_instancia(paths):
     return trava if trava.tryLock(0) else None
 
 
+def calar_aviso_do_perfil_de_cor():
+    """
+    Monitor com perfil de cor sem nome (o macOS gera assim para alguns monitores): o Qt avisa
+    "Failed to parse description" a cada redesenho de uma janela nele, mas usa o perfil e as cores ficam certas.
+    Sem isto, o terminal enche enquanto o pet está nesse monitor.
+    QT_LOGGING_RULES=qt.gui.icc.warning=true traz o aviso de volta.
+    """
+    QLoggingCategory.setFilterRules("qt.gui.icc.warning=false")
+
+
 def deve_mostrar_tela(args, perms, primeira_vez):
     """Tela de permissões: na primeira vez, se pedida, antes de clicar em Começar ou para religar após o pânico."""
     if primeira_vez or args.configurar:
@@ -60,6 +70,7 @@ def main():
     parser.add_argument("--sair-em", type=float, default=0.0, help="fecha sozinho após N segundos (teste)")
     args = parser.parse_args()
 
+    calar_aviso_do_perfil_de_cor()                  # antes do QApplication, que já lê o perfil dos monitores
     app = QApplication(sys.argv)
     app.setQuitOnLastWindowClosed(False)
     app.setWindowIcon(face_icon())

@@ -1,6 +1,12 @@
 # Dados do usuário (aprendizado, histórico, logs): nunca vão para o repositório
 memory/
 
+# Voz natural instalada pelo menu (PyTorch + modelo OmniVoice, uns 4,5 GB): cada um baixa a sua
+voz_natural/
+
+# IA local (em teste) instalada pelo Pestinha: llama.cpp + modelo de linguagem (uns 1,3 GB)
+ia_local/
+
 # Gerados pelo Python, pytest e PyInstaller
 __pycache__/
 *.pyc

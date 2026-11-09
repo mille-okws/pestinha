@@ -90,7 +90,7 @@ saudade de você
 [castigo]
 ISSO NÃO É JUSTO.
 MEU ADVOGADO SERÁ INFORMADO.
-470 NEURÔNIOS. ZERO DIREITOS.
+490 NEURÔNIOS. ZERO DIREITOS.
 EU SÓ QUERIA BRINCAR.
 ESTOU AQUI PENSANDO NOS MEUS ERROS.
 
@@ -101,3 +101,11 @@ ESTOU AQUI PENSANDO NOS MEUS ERROS.
 #@$%&!!!
 $%#@&*@#!!
 @!#%$...
+
+# Cantinho do castigo: o que ele FALA quando o xingamento é só símbolos (não vira placa)
+[resmungo]
+argh! eu odeio esse cantinho!
+que ódio do cursor!
+isso vai pro meu advogado!
+hmpf. não falo mais com você.
+piii! piii! piii!

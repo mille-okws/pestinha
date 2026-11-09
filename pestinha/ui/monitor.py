@@ -48,7 +48,8 @@ class NeuralMonitor(FloatingWidget):
     """Janela de diagnóstico: mostra os disparos da rede, a atividade dos motores e as necessidades do pet em tempo real."""
     def __init__(self, app, default_pos):
         """Cria a janela do monitor e um relógio para redesenhar."""
-        super().__init__(app, "neural", f"{app.nome} · Monitor neural", (1180, 700), (980, 620), default_pos)
+        super().__init__(app, "neural", f"{app.nome} · Monitor neural", (1180, 700), (980, 620), default_pos,
+                         na_frente=False)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.timer.start(100)

@@ -21,10 +21,18 @@ from ..ajustes import TAMANHO_MEME as MEME_MAX, TAMANHO_MEME_CANTO as CORNER_MAX
 CORNER_MARGIN = 18
 
 
+# sem falas_memes.txt no pet: o que ele fala ao trazer uma imagem
+REACOES_MEME = ["olha isso.", "trouxe um presente.", "achei a sua cara.", "não aguentei, tive que mostrar.",
+                "isso aqui é sério."]
+REACOES_FOTO = ["olha que foto.", "trouxe uma foto pra você.", "lembra disso?"]
+
+
 class MischiefEngine(QObject):
     """Guarda os objetos na tela e decide a próxima travessura."""
 
     dismissed = Signal(object, float)     # (objeto, segundos que ficou na tela)
+    bilhete_novo = Signal(str)            # um post-it apareceu na tela (o texto dele)
+    fala_nova = Signal(str)               # apareceu algo que fala (post-it, ou meme com reação): para a voz
 
     def __init__(self, conteudo):
         """Guarda os objetos na tela (memes, bilhetes, fotos) e o conteúdo do pet para sorteá-los."""
@@ -33,6 +41,7 @@ class MischiefEngine(QObject):
         self.paths = conteudo                                 # ConteudoPaths: só o conteúdo deste pet e o comum
         self.notes = config.Notes(conteudo.notes)
         self.notes_sad = config.Notes(conteudo.notes_sad)       # bilhetes de quando ele está triste
+        self.reacoes = config.Notes(conteudo.falas_memes)       # o que ele fala ao trazer um meme ou foto
 
     # ---------------- agenda ----------------
 
@@ -94,14 +103,28 @@ class MischiefEngine(QObject):
             path = config.random_photo(self.paths.fotos)
             thing = ImageThing(path, MEME_MAX) if path else None
         else:
-            notes = self.notes_sad if kind == "bilhete_triste" else self.notes
-            text = notes.pick()
+            text = self.escolher_texto(kind)
             thing = NoteThing(text, small=small) if text else None
         if thing is not None and not getattr(thing, "valida", True):
             thing.deleteLater()                      # imagem ilegível: nada de objeto invisível na tela
             return None
         if thing is not None:
             thing.clicked.connect(self._on_click)
+        return thing
+
+    def escolher_texto(self, kind):
+        """Uma frase já escrita para o post-it: de recadinhos.txt (ou dos bilhetes tristes)."""
+        notes = self.notes_sad if kind == "bilhete_triste" else self.notes
+        return notes.pick()
+
+    def escolher_reacao(self, kind):
+        """O que ele fala ao trazer um meme ou foto: de falas_memes.txt, ou uma reação padrão."""
+        return self.reacoes.pick() or random.choice(REACOES_FOTO if kind == "foto" else REACOES_MEME)
+
+    def bilhete(self, texto, small=False):
+        """Um post-it com este texto (já escrito ou inventado pela IA local), pronto para aparecer."""
+        thing = NoteThing(texto, small=small)
+        thing.clicked.connect(self._on_click)
         return thing
 
     # ---------------- colocação ----------------
@@ -151,6 +174,10 @@ class MischiefEngine(QObject):
         """Põe um objeto na lista e o mostra."""
         self.things.append(thing)
         thing.show()
+        if isinstance(thing, NoteThing):
+            self.bilhete_novo.emit(thing.text)
+        if getattr(thing, "fala", None):
+            self.fala_nova.emit(thing.fala)
 
     # ---------------- ciclo ----------------
 

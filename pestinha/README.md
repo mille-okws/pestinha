@@ -15,11 +15,11 @@ core  <  sense  <  body  <  world  <  mind  <  ui  <  controle  <  app.py
 | Pasta | Papel |
 |---|---|
 | `core/` | Cérebro e regras puras: rede neural, emoção, homeostase, memória, condicionamento, física e protesto. Sem Qt e sem API do sistema, para ser testável em qualquer lugar. |
-| `plataforma/` | Tudo que depende do sistema operacional: programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho de pânico. Um módulo por sistema (Windows, macOS, Linux). Só nome de programa e geometria; nunca conteúdo nem título de janela. |
+| `plataforma/` | Tudo que depende do sistema operacional: programa em primeiro plano, tempo ocioso, janelas, tela cheia, foco e o atalho de pânico. Um módulo por sistema (Windows, macOS, Linux). Só nome de programa e geometria; nunca título de janela. O print da tela, só com a permissão 'Espiar a tela', para a IA local. |
 | `sense/` | Sentidos: o que as leituras da plataforma significam (atividade, tela cheia, janela para pousar) e registro da rotina. Nunca conteúdo nem título de janela. |
 | `body/` | O corpo do pet: a janela com o rosto, o estado que ele mostra, o comportamento (movimento) e a bolinha. |
 | `world/` | Objetos que aparecem na tela: post-its, memes, cartazes, notebook, fogos e a janela arrastável base. |
-| `mind/` | Controladores de decisão: ligam o que a rede decide à cena (sono, mesa, protesto, travessuras, festa, revolução, cantinho do castigo). |
+| `mind/` | Controladores de decisão: ligam o que a rede decide à cena (sono, mesa, protesto, travessuras, festa, revolução, cantinho do castigo), e a fila que prepara a IA local e a voz antes de algo aparecer. |
 | `ui/` | Janelas de interface: tela de permissões, bandeja, passo a passo, monitor neural e painel de protesto. |
 | `controle/` | Mixins de `PestinhaApp`: sessão (permissões, visibilidade, pausa, pânico, salvar, sair, apagar) e interação (cutucar, arrastar, menus, notebook). |
 | `app.py` | Composição: cria tudo, liga os relógios e roda os três ciclos (sentidos, pensamento e quadro). |
