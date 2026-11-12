@@ -4,6 +4,10 @@ PROTEST CONTROLLER - liga o protesto (core/protesto.py) à cena: cartaz, estági
 O core/protesto.py decide a insatisfação e o estágio. Este controlador cuida do que
 aparece na tela: o cartaz preso no pet, a bandeja da revolução, o cartaz
 que volta maior depois de arrancado e o cartaz de acordo ou desistência.
+
+Com a voz natural, a fala do cartaz é gerada antes (`preparar`, ligado pelo app):
+o cartaz aparece junto com o áudio. Se o estágio mudar enquanto isso, o cartaz
+preparado é descartado e o do estágio novo é preparado no lugar.
 """
 
 from ..log import log
@@ -28,6 +32,11 @@ class ProtestController:
         self.state = state          # PetState: protest_stage é espelhado aqui
         self.debug = debug
         self.visivel = True         # o cartaz novo nasce com a visibilidade da sessão
+        self.ao_mostrar = None      # chamado com o texto de cada cartaz novo (a voz)
+        self.ao_tirar = None        # chamado com o texto do cartaz que saiu (a voz para, e não repete)
+        # (texto, pronto, falhou, cancelado) -> True se a fala vai ser preparada antes (o app liga)
+        self.preparar = None
+        self.esperando = None       # (info, estágio) do cartaz que está sendo preparado
 
     @property
     def stage(self):
@@ -60,8 +69,7 @@ class ProtestController:
         now = time.monotonic()
         if new == 0:
             by_caress = now - self.protest.last_caress < 5.0
-            self.protest.end_until = now + END_SIGN_SECONDS      # antes de mostrar: senão some na hora
-            self.show(criar_cartaz(self.protest.escolher_cartaz(fim_por_carinho=by_caress)))
+            self.novo_cartaz(self.protest.escolher_cartaz(fim_por_carinho=by_caress))
         else:
             self.protest.respawn_at = now           # o cartaz do estágio novo sobe no próximo quadro
             self.behavior.drop_carried()
@@ -86,27 +94,71 @@ class ProtestController:
 
     # ---------------- cena ----------------
 
+    def novo_cartaz(self, info):
+        """Um cartaz novo (`info` vem do escolher_cartaz): prepara a fala antes (voz natural) ou mostra na hora."""
+        estagio = self.protest.stage
+        if self.preparar is not None and self.preparar(
+                info["texto"],
+                lambda _frase: self._preparado(info, estagio),          # pronto, com o áudio
+                lambda _motivo: self._preparado(info, estagio),         # sem o áudio: mostra assim mesmo
+                self.preparo_cancelado):
+            self.esperando = (info, estagio)
+            return
+        self._mostrar_agora(info)
+
+    def _preparado(self, info, estagio):
+        """(Tela) A fala do cartaz ficou pronta: mostra, se ainda é o cartaz esperado e o estágio é o mesmo."""
+        if self.esperando is None or self.esperando[0] is not info:
+            return False
+        self.esperando = None
+        pr = self.protest
+        if pr.stage != estagio or pr.sign is not None:
+            if pr.stage and pr.sign is None and pr.respawn_at is None:
+                pr.respawn_at = time.monotonic()        # o estágio mudou no meio: prepara o cartaz certo
+            return False
+        self._mostrar_agora(info)
+        return True
+
+    def preparo_cancelado(self):
+        """A fila foi cancelada (pânico, fechar): esquece o cartaz que estava sendo preparado."""
+        if self.esperando is not None:
+            self.esperando = None
+            if self.protest.stage and self.protest.sign is None:
+                self.protest.respawn_at = time.monotonic()
+
+    def _mostrar_agora(self, info):
+        """Mostra o cartaz já (o de fim de protesto fica alguns segundos)."""
+        if self.protest.stage == 0:
+            self.protest.end_until = time.monotonic() + END_SIGN_SECONDS   # antes de mostrar: senão some na hora
+        self.show(criar_cartaz(info))
+
     def show(self, sign):
         """Mostra um cartaz novo, preso no pet."""
         sign.clicked.connect(self.on_sign_clicked)
         self.protest.sign = sign
         self.carry(time.monotonic(), asleep=False)
         sign.setVisible(self.visivel)
+        if self.ao_mostrar is not None and self.visivel:
+            self.ao_mostrar(getattr(sign, "text", ""))
 
     def drop_sign(self):
         """Tira o cartaz que está sendo mostrado."""
         sign = self.protest.sign
         self.protest.sign = None
         if sign is not None:
+            texto = getattr(sign, "text", None)
+            if self.ao_tirar is not None and texto:      # sem texto, não cala outra fala
+                self.ao_tirar(texto)
             sign.close()
             sign.deleteLater()
 
     def carry(self, now, asleep):
         """O cartaz vai preso em cima dele; a bandeja, ao lado. Some ao dormir."""
         pr = self.protest
-        if pr.sign is None and pr.stage and pr.respawn_at and now >= pr.respawn_at and not asleep:
+        if (pr.sign is None and pr.stage and pr.respawn_at and now >= pr.respawn_at and not asleep
+                and self.esperando is None):
             pr.respawn_at = None
-            self.show(criar_cartaz(pr.escolher_cartaz()))
+            self.novo_cartaz(pr.escolher_cartaz())
         if pr.stage == 0 and pr.sign is not None and now > pr.end_until:
             self.drop_sign()
             return

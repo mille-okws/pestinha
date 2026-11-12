@@ -126,6 +126,9 @@ LIMIAR_CANTO_HZ = 3.0           # CANTO acima disso: vai para o cantinho
 GANHO_TRAVESSURA = 0.002        # travessuras por segundo, por Hz do motor TRAVESSURA
 GANHO_CARTAZ = 0.5              # cartazes por segundo, por Hz do motor CARTAZ
 GANHO_PAPEL = 0.05              # bolinhas de papel por segundo, por Hz do motor PAPEL
+INVENTAR_TAXA_CHEIA_HZ = 25.0   # INVENTAR nessa taxa: todo post-it sai com frase nova (IA local); a metade, metade
+GANHO_ESPIAR = 0.0005           # espiadas na tela por segundo, por Hz do motor ESPIAR (curioso: ~1 a cada 5 min)
+ESPIAR_INTERVALO_S = 600.0      # s: no mínimo isso entre uma espiada e outra (no modo teste, 30 s)
 
 # ---------------------------------------------------------------------------
 # Rosto e janela
@@ -209,6 +212,9 @@ _LIMITES = {
     "GANHO_TRAVESSURA": (float, 0.0, 1.0),
     "GANHO_CARTAZ": (float, 0.0, 1.0),
     "GANHO_PAPEL": (float, 0.0, 1.0),
+    "INVENTAR_TAXA_CHEIA_HZ": (float, 0.1, 500.0),
+    "GANHO_ESPIAR": (float, 0.0, 1.0),
+    "ESPIAR_INTERVALO_S": (float, 10.0, 86400.0),
     "LADO_JANELA_PET": (int, 100, 1000),
     "ZZZ_QUANTIDADE": (int, 0, 20),
     "ZZZ_PERIODO": (float, 0.1, 60.0),

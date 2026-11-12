@@ -1,5 +1,5 @@
 """
-MACOS DE VERDADE - janelas, atalho e leituras do sistema num Mac real, sem imitar o AppKit.
+MACOS REAL - janelas, atalho e leituras do sistema no macOS, sem imitar o AppKit.
 
 Só roda no macOS (num Mac comum e no macos-latest do CI); o que precisa de tela pula sem sessão
 gráfica. As partes com janela rodam em outro processo (tests/macos_cocoa.py), com o Qt no Cocoa.
@@ -79,6 +79,23 @@ def test_janela_do_pet_vira_painel_que_nao_some_nem_ativa(reais, nome):
     assert janela["mascara"] & macos.PAINEL_SEM_ATIVAR
     assert janela["comportamento"] == macos.EM_TODOS_OS_ESPACOS
     assert janela["na_tela_antes"]
+
+
+@requer_tela
+@pytest.mark.parametrize("nome", JANELAS_DO_PET)
+def test_janela_da_cena_fica_acima_das_janelas_normais(reais, nome):
+    assert reais["janelas"][nome]["nivel"] > macos.NIVEL_NORMAL
+
+
+@requer_tela
+def test_monitor_e_painel_de_protesto_ficam_no_nivel_normal_sem_sumir(reais):
+    """Só a cena fica na frente: os painéis ficam atrás quando você usa outro programa, mas continuam na tela."""
+    janela = reais["janelas"]["painel_normal"]
+    assert janela["nivel"] == macos.NIVEL_NORMAL
+    assert janela["some_ao_desativar"] is False and janela["mascara"] & macos.PAINEL_SEM_ATIVAR
+    assert janela["na_tela_antes"]
+    _exige_troca_de_foco(reais)
+    assert janela["na_tela_depois"]
 
 
 @requer_tela

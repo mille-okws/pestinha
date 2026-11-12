@@ -39,9 +39,10 @@ A exceção é `test_macos_real.py`: no macOS, abre janelinhas de verdade por al
 | `test_escolha_pet.py` | Etapa 3 do multipet: escolha do personagem nas configurações e o nome certo em cada texto. |
 | `test_festa.py` | Fogos de artifício ligados à rede e brincadeira mais animada quando feliz. |
 | `test_homeostase.py` | Homeostase: trabalhar é estímulo, então o tédio não sobe enquanto ele programa. |
+| `test_ia_local.py` | IA local (em teste): instalação do llama.cpp, do modelo e da visão, o pedido que sai do estado da rede, a limpeza da resposta, escrever e comentar a tela, e o post-it que ele entrega. |
 | `test_janela_na_frente.py` | No macOS o pet não some ao trocar de programa; as Configurações pedem o foco. |
 | `test_jorge.py` | Etapa 4 do multipet: o Jorge, segundo personagem, feito só de configuração e conteúdo. |
-| `test_macos_real.py` | Janelas, atalho e leituras do sistema num Mac real, sem imitar o AppKit. |
+| `test_macos_real.py` | Janelas, atalho e leituras do sistema no macOS, sem imitar o AppKit. |
 | `test_melhorias_windows.py` | Melhorias para o Windows: tela cheia, vários monitores, pasta de dados, uma cópia só, início automático e fechamento seguro. |
 | `test_mesa.py` | Notebook: sentar e levantar pelo disparo do neurônio SENTAR. |
 | `test_migracao.py` | Etapa 1 do multipet: memória por pet (memory/pets/<pet>/) e a migração da versão antiga. |
@@ -49,5 +50,7 @@ A exceção é `test_macos_real.py`: no macOS, abre janelinhas de verdade por al
 | `test_paineis.py` | Painéis do menu (monitor neural e painel de protesto): abrir à mão deve manter o painel na tela. |
 | `test_pedido.py` | Pedir para trabalhar: o neurônio SENTAR decide. |
 | `test_plataforma.py` | Plataforma: cada sistema expõe as mesmas funções, e as leituras de texto (wmctrl, xdotool, ioreg, janelas do Quartz) são testadas com saídas de exemplo, em qualquer sistema. |
+| `test_preparo.py` | Preparar antes de mostrar: a fila (um modelo por vez), a voz gerada antes do post-it ou cartaz e apagada depois, a rede escolhendo frase nova ou já escrita (INVENTAR) e quando espiar a tela (ESPIAR). |
 | `test_robustez.py` | Robustez: arquivo corrompido, assets faltando, log em arquivo. |
 | `test_robustez_v2.py` | Falhas do relatório técnico (docs/auditorias/ANALISE_TECNICA.md): cada caso tem um teste que reproduz o problema. |
+| `test_voz.py` | Voz: texto e emoção, fala preparada antes e apagada depois de tocar, voz natural (motor e trabalhador do OmniVoice), instalação e a tela. |

@@ -31,6 +31,10 @@ class PainelFalso:
         self.some_ao_desativar = True
         self.mascara = 0xe
         self.comportamento = 0x102
+        self.nivel = 3                      # o Qt põe o Qt.Tool no NSFloatingWindowLevel
+
+    def setLevel_(self, valor):
+        self.nivel = valor
 
     def setHidesOnDeactivate_(self, valor):
         self.some_ao_desativar = valor
@@ -61,6 +65,14 @@ def test_painel_aparece_em_todos_os_spaces_e_sobre_tela_cheia(macos):
     painel = PainelFalso()
     macos.manter_na_frente(painel)
     assert painel.comportamento == (1 << 0) | (1 << 4) | (1 << 8)
+
+
+def test_painel_normal_fica_no_nivel_normal_sem_sumir_nem_roubar_o_foco(macos):
+    painel = PainelFalso()
+    macos.deixar_normal(painel)
+    assert painel.nivel == macos.NIVEL_NORMAL == 0
+    assert painel.some_ao_desativar is False and painel.mascara & macos.PAINEL_SEM_ATIVAR
+    assert painel.comportamento == 0x102                # só o pet e a cena vão para todos os Spaces
 
 
 class AppFalso:
@@ -125,7 +137,8 @@ def test_configuracoes_pedem_o_foco_ao_abrir(monkeypatch):
     dialogo = Mock()
     monkeypatch.setattr("pestinha.controle.sessao.SettingsDialog", lambda *_a, **_k: dialogo)
     app = SimpleNamespace(settings=None, perms={}, paths=None, timeline=Mock(),
-                          apply_perms=Mock(), wipe_all_data=Mock())
+                          apply_perms=Mock(), wipe_all_data=Mock(),
+                          _voz_natural_vai_mudar=Mock(), _voz_natural_mudou=Mock(), testar_meme=Mock())
     SessaoMixin.open_settings(app)
     dialogo.show.assert_called_once()
     dialogo.activateWindow.assert_called_once()

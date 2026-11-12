@@ -15,6 +15,8 @@ Um pet são duas coisas com o mesmo nome:
 | `brincadeira` | Pesos de cada jeito de brincar: `bola` (chuta), `arremesso` (joga no cursor), `postit` (cola post-its). Peso 0 desliga. |
 | `temperamento` | Ganhos que multiplicam estímulos antes de chegarem aos interneurônios. Ex.: `"DISMISS->FRUSTRATION": 1.3` deixa o pet mais irritado quando você dispensa coisas. Os nomes estão em [docs/REDE_NEURAL.md](../docs/REDE_NEURAL.md). |
 | `reacao_notebook` | `"bravo"` ou `"triste"`: o que ele sente quando arrancam o notebook dele. |
+| `personalidade` | Opcional. Como ele é e como escreve, em poucas frases ("Você é..."). Vai no pedido das [frases com IA](../README.md#frases-com-ia-em-teste); até 600 caracteres. |
+| `voz` | Opcional. `sistema` (voz do macOS sem a voz natural, ex. `"Eddy"`), `velocidade` (0,5 a 2,0) e `seed` (semente da voz natural). Veja [Trocar a voz de um pet](../README.md#trocar-a-voz-de-um-pet). |
 | `aparencia` | Opcional. Cores `#rrggbb` de `moldura`, `casca`, `tela`, `olho` e `brilho`, e `acessorios` com a cor de cada um: `{"oculos": "#f2f2f2", "gravata": "#b3261e"}`. Sem o campo, o visual original. |
 
 Campos com tipo errado são ignorados e ficam com o valor padrão (não derrubam o app).
@@ -29,20 +31,34 @@ Pode editar com ele aberto: ele relê os textos e procura imagens novas sozinho.
 | `memes/trabalhando/` | Memes de quando você programa e ele não está sentado no notebook. |
 | `recadinhos.txt` | Uma frase por linha, sorteada para os post-its. `#` é comentário. |
 | `recadinhos_tristes.txt` | Bilhetes que ele cola quando está triste. |
-| `cartazes.txt` | Cartazes por seção: `[reclamacao]`, `[manifestacao]`, `[greve]`, `[revolucao]`, `[acordo]`, `[desistiu]`, `[saudade]`, `[chorando]`, `[abandonado]`, `[volto]`, e no cantinho do castigo `[castigo]` e `[xingamento]`. |
+| `falas_memes.txt` | Opcional. O que ele fala ao trazer um meme ou foto, com a voz ligada (uma fala por linha, `#` é comentário). Sem o arquivo, ele usa reações neutras. Com a IA local que enxerga, a rede às vezes prefere que a IA olhe a imagem e comente. |
+| `cartazes.txt` | Cartazes por seção: `[reclamacao]`, `[manifestacao]`, `[greve]`, `[revolucao]`, `[acordo]`, `[desistiu]`, `[saudade]`, `[chorando]`, `[abandonado]`, `[volto]`, e no cantinho do castigo `[castigo]` e `[xingamento]`. `[resmungo]` não vira placa: é o que ele fala, com a voz ligada, quando o xingamento é só símbolos. |
 | `bolinha_tenis.png`, `bolinha_papel.png`, `notebook.png` | Opcionais: se existirem aqui, valem no lugar dos de `assets/comum/`. |
+| `voz/referencia.wav` | A voz dele na voz natural: 3 a 10 segundos de uma pessoa só falando português. O modelo imita esse áudio em todas as frases. Para trocar a voz, troque este arquivo. |
+| `voz/referencia.txt` | O que é dito no `referencia.wav`, palavra por palavra. Sem os dois arquivos, ele usa a voz do sistema. |
 
 O que faltar na pasta do pet é procurado em `assets/comum/`. Se também não estiver lá, ele usa frases
 neutras (cartazes) ou simplesmente não faz aquela travessura (memes, post-its). **Nunca** usa o conteúdo
 de outro pet.
 
+## Como as vozes do Bryan e do Jorge foram feitas
+
+As duas foram criadas com o próprio OmniVoice, no modo que inventa uma voz a partir de uma descrição, e
+depois guardadas como `referencia.wav`. Assim, a voz não muda de uma frase para a outra.
+
+| Pet | Descrição usada | Semente |
+|---|---|---|
+| Bryan | `male, child, high pitch` | 11 |
+| Jorge | `male, young adult, high pitch`, um pouco mais rápido; o tom de coach vem da frase de referência | 11 |
+
 ## Personagens que já existem
 
-- **Bryan** (`bryan.json`, `bryan/`): o original.
+- **Bryan** (`bryan.json`, `bryan/`): o original. Voz de menino, aguda.
 - **Jorge** (`jorge.json`, `jorge/`): coach trambiqueiro. Mais insistente quando ignorado, muito animado
   com atenção, desesperado quando dispensam as coisas dele e quase nunca triste. O panfleto que ele atira
   (`jorge/bolinha_papel.png`) é desenhado por `ferramentas/gerar_panfleto.py`. Moldura e olhos dourados
-  e gravata vermelha. Memes felizes, contentes, curiosos e bravos próprios em `jorge/memes/feliz/`, `contente/`, `curioso/` e `bravo/`; as outras emoções ainda sem memes.
+  e gravata vermelha. Voz de jovem animado de palco, que fala um pouco mais rápido (`"velocidade": 1.15`).
+  Memes felizes, contentes, curiosos e bravos próprios em `jorge/memes/feliz/`, `contente/`, `curioso/` e `bravo/`; as outras emoções ainda sem memes.
 
 ## Criar outro pet
 
@@ -51,7 +67,9 @@ de outro pet.
 2. Crie a pasta `jorge/` com as frases e memes dele. Pode começar vazia: ele funciona com o neutro.
 3. Escolha o personagem em Configurações. A troca vale na próxima vez que abrir.
 4. A memória dele fica separada, em `memory/pets/jorge/`.
-5. Confira se os cartazes cabem nas placas: `python ferramentas/medir_cartazes.py jorge`.
+5. Para ele ter voz própria, coloque `jorge/voz/referencia.wav` e `jorge/voz/referencia.txt`
+   ([como](../README.md#trocar-a-voz-de-um-pet)). Sem eles, usa a voz do sistema.
+6. Confira se os cartazes cabem nas placas: `python ferramentas/medir_cartazes.py jorge`.
 
 Cada chave do `temperamento` precisa ser uma ligação que existe (`SENSOR->INTERNEURÔNIO` ou só o
 interneurônio); `tests/test_jorge.py` confere isso para todos os pets.

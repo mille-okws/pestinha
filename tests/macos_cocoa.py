@@ -75,6 +75,8 @@ def janelas():
         "objeto": Thing(60, 40),
         "fogos": Fireworks(),
         "painel": FloatingWidget(painel_app, "teste", "Painel de teste", (160, 100), (80, 60), (0, 0)),
+        "painel_normal": FloatingWidget(painel_app, "teste2", "Monitor de teste", (160, 100), (80, 60), (0, 0),
+                                        na_frente=False),
     }
     tela = app.primaryScreen().availableGeometry()
     for ordem, janela in enumerate(criadas.values()):
@@ -120,6 +122,7 @@ def janelas():
                 "some_ao_desativar": bool(nativa.hidesOnDeactivate()),
                 "mascara": int(nativa.styleMask()),
                 "comportamento": int(nativa.collectionBehavior()),
+                "nivel": int(nativa.level()),
                 "na_tela_antes": numeros[nome] in antes,
                 "na_tela_depois": numeros[nome] in depois,
             }

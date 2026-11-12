@@ -52,7 +52,8 @@ class StrikePanel(FloatingWidget):
     """Painel de protesto: mostra a insatisfação, o estágio e quanto tempo falta para a próxima subida."""
     def __init__(self, app, default_pos):
         """Cria o painel e um relógio para atualizar os números."""
-        super().__init__(app, "greve", f"{app.nome} · Painel de protesto", (560, 330), (460, 300), default_pos)
+        super().__init__(app, "greve", f"{app.nome} · Painel de protesto", (560, 330), (460, 300), default_pos,
+                         na_frente=False)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.timer.start(250)

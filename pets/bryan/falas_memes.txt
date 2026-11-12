@@ -1,0 +1,12 @@
+# O que o Bryan fala quando traz um meme ou uma foto (só com a voz ligada). Uma fala por linha.
+# Linhas que começam com # são ignoradas. Pode editar com ele rodando: ele relê o arquivo sozinho.
+olha isso.
+trouxe um presente pra você.
+achei a sua cara.
+não aguentei, tive que mostrar.
+isso aqui sou eu às três da manhã.
+guarda esse, é raro.
+eu ri sozinho no monitor.
+não fala que fui eu que trouxe.
+olha o que eu achei na sua lixeira.
+isso explica muita coisa.

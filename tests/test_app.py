@@ -91,6 +91,8 @@ def test_apagar_memoria_informa_falha_sem_fingir_sucesso(tmp_path, monkeypatch):
 
 def test_modo_teste_mostra_os_paineis(buddy):
     buddy.apply_perms(dict(buddy.perms, modo_teste=True, ativo=True))
+    assert not buddy.floats.aberto("neural") and not buddy.floats.aberto("greve")   # padrão: só pelo menu
+    buddy.apply_perms(dict(buddy.perms, paineis_teste=True))
     assert buddy.floats.windows.get("neural") is not None
     assert buddy.floats.windows["neural"].isVisible()
     assert buddy.floats.windows["greve"].isVisible()
@@ -99,7 +101,7 @@ def test_modo_teste_mostra_os_paineis(buddy):
 
 
 def test_painel_arrastado_salva_a_posicao(buddy, tmp_path):
-    buddy.apply_perms(dict(buddy.perms, modo_teste=True, ativo=True))
+    buddy.apply_perms(dict(buddy.perms, modo_teste=True, paineis_teste=True, ativo=True))
     w = buddy.floats.windows["greve"]
     start = QPointF(w.mapToGlobal(w.rect().center()))
     end = start + QPointF(-120, 80)
@@ -117,7 +119,7 @@ def test_painel_arrastado_salva_a_posicao(buddy, tmp_path):
 
 
 def test_painel_nao_entra_na_lista_de_pouso(buddy):
-    buddy.apply_perms(dict(buddy.perms, modo_teste=True, ativo=True))
+    buddy.apply_perms(dict(buddy.perms, modo_teste=True, paineis_teste=True, ativo=True))
     buddy.floats.windows["greve"].move(100, 100)
     buddy.floats.windows["neural"].move(100, 500)
     handles = {int(w.winId()) for w in buddy.floats.windows.values()}

@@ -2,7 +2,7 @@
 
 > Gerado por `ferramentas/gerar_doc_rede.py` a partir do código. Não edite à mão: rode o script.
 
-A rede tem **470 neurônios** de integração e disparo com vazamento (LIF), **15939 sinapses**, **30 canais sensoriais**, **10 populações de interneurônios** e **15 populações motoras**.
+A rede tem **490 neurônios** de integração e disparo com vazamento (LIF), **17439 sinapses**, **30 canais sensoriais**, **10 populações de interneurônios** e **17 populações motoras**.
 
 ## Como o sinal anda
 
@@ -21,7 +21,7 @@ computador e você ──► sentidos (0..1) ──► neurônios sensoriais (Po
 
 - **Habituação:** cada canal perde eficácia a cada disparo (`d`) e recupera em `tau_rec` segundos.
 - **Temperamento:** `pets/*.json` multiplica as sinapses que saem dos sentidos (o mesmo estímulo pesa diferente em cada pet).
-- **Inibição lateral:** motores competem só dentro do seu grupo (expressão com expressão, decisão com decisão).
+- **Inibição lateral:** motores competem só dentro do seu grupo (expressão com expressão, decisão com decisão). Os moduladores (`INVENTAR`) não competem com ninguém: dizem como fazer, não o quê.
 - **Aprendizado por carinho:** regra de três fatores entre canais sensoriais e PLAYFUL/CALM/FRUSTRATION/GLOOM, com recompensa (+ carinho, − dispensa e castigo).
 - **Condicionamento:** Rescorla–Wagner fora da rede (`core/conditioning.py`); a força prevista entra como `ANTICIPATE` (cutucada/arraste) e `ANTECIPA_PLACA` (cantinho).
 
@@ -94,6 +94,8 @@ computador e você ──► sentidos (0..1) ──► neurônios sensoriais (Po
 | `TRAVESSURA` | decisão | aprontar | PLACA (−0.60), GLOOM (−0.50), BOREDOM (+0.30), CALM (−0.30), CURIOUS (+0.20), RANCOR (+0.15), PLAYFUL (+0.12) | apronta uma travessura (a taxa vira a frequência) |
 | `PAPEL` | decisão | atirar papel | FRUSTRATION (+0.40), CALM (−0.40) | atira bolinha de papel (na revolução) |
 | `ACEITAR` | decisão | aceitar o castigo | CALM (+0.45), FRUSTRATION (−0.40), CARESS (+0.30), RANCOR (−0.20), VISITA (+0.08) | aceita o castigo e sai do canto por conta própria (perdão) |
+| `INVENTAR` | modulador | inventar frase | TIRED (−0.30), BOREDOM (+0.25), CURIOUS (+0.15), PLAYFUL (+0.12), CALM (−0.10) | escreve um post-it novo (IA local) em vez de um já escrito |
+| `ESPIAR` | decisão | espiar a tela | TIRED (−0.40), GLOOM (−0.40), PLACA (−0.40), CURIOUS (+0.20), NOVELTY (+0.06), WEB (+0.03) | espia a tela e comenta (IA local com visão) |
 
 ## Decisões pela rede
 
@@ -108,5 +110,7 @@ Os motores de decisão viram comportamento assim (valores em `pestinha/ajustes.p
 | Travessuras | por segundo: taxa de `TRAVESSURA` × 0.002. |
 | Cartazes do castigo | por segundo: taxa de `CARTAZ` × 0.5 (cada um fica ao menos 8 s). |
 | Bolinhas de papel | por segundo: taxa de `PAPEL` × 0.05 (só na revolução). |
+| Frase nova ou já escrita | num post-it, chance de a IA local escrever uma frase nova = taxa de `INVENTAR` ÷ 25 Hz (no máximo 1); senão, uma de `recadinhos.txt`. |
+| Espiar a tela | por segundo: taxa de `ESPIAR` × 0.0005, no máximo uma vez a cada 10 min (só com a permissão e a IA local com visão). |
 
 Regras que ainda não são da rede: as condições do corpo (dormindo, segurado, no ar), os estágios do protesto (acúmulo com limiar), o sono pela energia e a escolha do tipo de travessura (memória episódica).

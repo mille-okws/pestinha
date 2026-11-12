@@ -101,7 +101,7 @@ def test_conteudo_do_bryan_esta_na_pasta_dele():
     for imagem in (c.bolinha_tenis, c.bolinha_papel, c.notebook):
         assert imagem.parent == paths.comum, imagem
     placas = load_signs(c.signs)
-    assert "470 NEURÔNIOS. ZERO DIREITOS." in placas["castigo"]
+    assert "490 NEURÔNIOS. ZERO DIREITOS." in placas["castigo"]
     assert "ABAIXO O GERENCIADOR DE TAREFAS" in placas["revolucao"]
     assert "@#$%@!!!!" in placas["xingamento"]
 

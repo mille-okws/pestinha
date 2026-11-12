@@ -2,7 +2,7 @@
 Plataforma: cada sistema expõe as mesmas funções, e as leituras de texto (wmctrl, xdotool, ioreg,
 janelas do Quartz) são testadas com saídas de exemplo, em qualquer sistema.
 
-O caminho real do macOS é testado num Mac de verdade em test_macos_real.py. O do Linux ainda precisa
+O caminho real do macOS é testado no macOS, com janelas reais, em test_macos_real.py. O do Linux ainda precisa
 ser testado numa máquina de verdade (ver README).
 """
 import os

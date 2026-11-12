@@ -67,11 +67,17 @@ def mundo(monkeypatch):
 
 
 # 01
+def _tela_cheia(b, cheia):
+    """O pet some (e volta) com a tela cheia: o jeito de ele sair da tela sem desligar."""
+    b.fullscreen = cheia
+    b.update_visibility()
+
+
 def test_01_ligar_cantinho_escondido_nao_mostra_placa(mundo):
-    mundo.b.toggle_hidden()
+    _tela_cheia(mundo.b, True)
     mundo.b.castigo.toggle(mundo.b.bounds())
     assert not mundo.b.castigo.plaquinha.isVisible()
-    mundo.b.toggle_hidden()
+    _tela_cheia(mundo.b, False)
     assert mundo.b.castigo.plaquinha.isVisible()
 
 
@@ -87,7 +93,7 @@ def test_02_esconder_notebook_pausado_levanta(mundo):
 # 03
 def test_03_esconder_no_meio_do_arraste_solta(mundo):
     mundo.segurar()
-    mundo.b.toggle_hidden()
+    _tela_cheia(mundo.b, True)
     assert not mundo.b.pet.body.held and not mundo.b.senses.dragging
 
 

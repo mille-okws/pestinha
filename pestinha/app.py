@@ -69,6 +69,11 @@ from .mind.mischief_ctl import MischiefController
 from .mind.protest_ctl import ProtestController
 from .mind.revolucao import RevolucaoController
 from .mind.sleep import SleepController
+from .mind.espiar_ctl import EspiarController
+from .mind.fala_ctl import FalaController
+from .mind.preparo import Preparo
+from .mind.voz import Voz
+from .mind.voz_motor import MotorVoz
 from .paths import Paths
 from .sense import senses
 from .sense.timeline import TimelineRecorder
@@ -150,7 +155,7 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.pet.drag_ended.connect(lambda: self.senses.set_dragging(False))
         self.pet.thrown.connect(self.on_thrown)
         self.pet.menu_requested.connect(self.show_pet_menu)
-        self.ball_stored = False    # você guardou a bolinha pelo menu
+        self.ball_stored = not self.perms["inicio_bolinha"]    # guardada pelo menu (ou desde o começo)
         self.mischief = MischiefEngine(self.conteudo)
         self.mischief.dismissed.connect(self.on_dismissed)
         self.behavior = Behavior(self.pet.body, self.pet_state, self.mischief)
@@ -176,9 +181,42 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
                                                self.behavior, self.emotion, self.debugging)
         self.floats = FloatManager(self)
         self.mischief_ctl.postit_weight = Play(self.play_weights).weight("postit")
+        # ----- voz: lê post-its e cartazes (voz natural, se instalada; senão a do sistema) -----
+        self.voz = Voz(self.paths.voz(pet_id), motor=MotorVoz(self.paths.voz_natural, self.paths.log_voz),
+                       referencia=self.conteudo.voz_referencia,
+                       referencia_texto=self.conteudo.voz_referencia_texto, ajustes=pet_def.get("voz"))
+        self.voz.limpar_pasta()                      # áudios que sobraram de uma vez que fechou no meio
+        self.voz.repeticao = lambda: (self.perms["repetir_vezes"], self.perms["repetir_pausa_ms"] / 1000)
+        self.mischief.fala_nova.connect(self.falar)          # post-it, ou meme com reação
+        self.protest_ctl.ao_mostrar = lambda texto: self.falar(texto, self.emocao_do_protesto())  # raiva
+        self.sad_ctl.ao_mostrar = lambda texto: self.falar(texto, "triste")        # abandono é tristeza
+        self.protest_ctl.ao_tirar = self.sad_ctl.ao_tirar = self.voz.parar         # o cartaz saiu: para de falar
+        # ----- preparo: a IA escreve e a voz gera ANTES de o post-it ou cartaz aparecer, um modelo por vez -----
+        self.personalidade = pet_def.get("personalidade")
+        self.preparo = Preparo(parent=self)
+        self.fala = FalaController(self.preparo, self.voz, self.paths.ia_local, lambda: self.perms, self.debugging,
+                                   copia_do_print=self.paths.ultima_espiada)
+        if not self.debugging():
+            self.paths.ultima_espiada.unlink(missing_ok=True)        # a cópia do print é só do Modo teste
+        self.protest_ctl.preparar = lambda *a: self._preparar_cartaz("cartaz de protesto",
+                                                                     self.emocao_do_protesto(), *a)
+        self.sad_ctl.preparar = lambda *a: self._preparar_cartaz("cartaz triste", "triste", *a)
+        self.mischief_ctl.fala = self.fala
+        self.mischief_ctl.escritor = self.escritor_ia                # a rede (INVENTAR) decide quando usar
+        self.mischief_ctl.pode_inventar = lambda: self.perms["inventar"] and self.fala.ia()
+        self.mischief_ctl.pode_entregar = lambda acao: self._pode_entregar(acao) and not self.asleep
+        self.mischief_ctl.pode_falar = lambda: self.perms["voz"] and plataforma.TEM_VOZ    # sem voz: meme mudo
+        self.mischief_ctl.pode_ver = lambda: self.perms["inventar"] and self.fala.visao()
+        self.mischief_ctl.comentador = self.comentador_de_imagem
+        self.mischief_ctl.cena = self._cena
+        self.espiar = EspiarController(self.debugging)               # a rede (ESPIAR) decide quando espiar
         self.festa = FestaController(self.debugging)
         self.mesa = MesaController(self.debugging, self)
+        self.mesa.escondido = not self.perms["inicio_notebook"]      # sem o notebook ao abrir: aparece pelo menu
         self.castigo = CastigoController(self, self.debugging)
+        self.castigo.ao_mostrar = self.falar                 # cantinho: drama, ou bravo xingando (censurado)
+        self.castigo.preparar = lambda fala, emocao, *a: self._preparar_cartaz("cartaz do castigo", emocao,
+                                                                              fala, *a)
         paper = load_sprite(self.conteudo.bolinha_papel)
         self.revolucao = RevolucaoController(self.behavior.play, self.debugging, sprite=paper)
 
@@ -197,7 +235,6 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.tray.open_panel.connect(lambda: self.floats.open("greve"))
         self.tray.toggle_floating.connect(self.toggle_floating)
         self.tray.toggle_pause.connect(self.toggle_pause)
-        self.tray.toggle_hidden.connect(self.toggle_hidden)
         self.tray.clear_things.connect(self.clear_things)
         self.tray.panic.connect(self.panic)
         self.tray.quit.connect(self.quit)
@@ -207,7 +244,6 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.paused = False
         self._pausado_em = None         # quando a pausa começou (para descontar do tempo dos episódios)
         self._ultimo_think = None       # quando a rede foi integrada pela última vez
-        self.hidden = False
 
         # ----- relógios -----
         self.last_frame = time.monotonic()
@@ -248,6 +284,21 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
     def asleep(self):
         """Diz se o pet está dormindo."""
         return self.sleep.asleep
+
+    def emocao_do_protesto(self):
+        """
+        Como o cartaz é falado: bravo (reclamação, manifestação); na greve e na revolução, palavra de ordem
+        (sem pressa, mais alto, repetida depois de alguns segundos); o cartaz de fim, com a emoção da hora.
+        """
+        return {0: None, 3: "grevista", 4: "revoltado"}.get(self.protest.stage, "bravo")
+
+    def falar(self, texto, emocao=None):
+        """Um post-it ou cartaz apareceu: lê em voz alta com a emoção da hora (a dele, se não vier outra)."""
+        if self.perms["voz"] and self.pet.isVisible() and not self._congelado():
+            emocao = emocao or self.pet_state.emotion
+            self.voz.dizer(texto, emocao)
+            if self.debugging():
+                log(f"[voz] {emocao}: {texto!r}")
 
     # ---------------- geometria ----------------
 
@@ -529,7 +580,10 @@ class PestinhaApp(SessaoMixin, InteracaoMixin, QObject):
         self.behavior.toy = (self.ball.body.x, self.ball.body.y) if self.ball.isVisible() else None
         self.mischief.tick(dt, bounds[3])
         self.pet.animate(now)
+        # apaga o áudio que terminou de tocar; na greve e na revolução, repete a fala (se ainda pode falar)
+        self.voz.recolher(pode_repetir=self.perms["voz"] and self.pet.isVisible() and not self._congelado())
         self.maybe_mischief(now, dt, bounds, cursor, motores)
+        self.maybe_espiar(now, dt, motores)
 
     def _notebook_perto(self):
         """Diz se o notebook está ao alcance dele: a distância do corpo até o centro do notebook."""

@@ -63,6 +63,14 @@ def _sem_foco(widget):
         pass    # sem janela nativa (ex.: teste offscreen) ou já destruída
 
 
+def set_normal(widget):
+    """Painel que não rouba o foco, mas fica no nível normal (outros programas podem ficar por cima)."""
+    try:
+        plataforma.janela_normal(int(widget.winId()))
+    except Exception:
+        pass    # sem janela nativa (ex.: teste offscreen)
+
+
 def overlay_flags():
     """Janela sem moldura, sempre por cima, que não aparece na barra de tarefas nem recebe foco ao aparecer."""
     return (

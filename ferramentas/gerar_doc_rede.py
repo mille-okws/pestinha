@@ -67,7 +67,8 @@ def main():
         "",
         "- **Habituação:** cada canal perde eficácia a cada disparo (`d`) e recupera em `tau_rec` segundos.",
         "- **Temperamento:** `pets/*.json` multiplica as sinapses que saem dos sentidos (o mesmo estímulo pesa diferente em cada pet).",
-        "- **Inibição lateral:** motores competem só dentro do seu grupo (expressão com expressão, decisão com decisão).",
+        "- **Inibição lateral:** motores competem só dentro do seu grupo (expressão com expressão, decisão com decisão). "
+        "Os moduladores (`INVENTAR`) não competem com ninguém: dizem como fazer, não o quê.",
         "- **Aprendizado por carinho:** regra de três fatores entre canais sensoriais e PLAYFUL/CALM/FRUSTRATION/GLOOM, "
         "com recompensa (+ carinho, − dispensa e castigo).",
         "- **Condicionamento:** Rescorla–Wagner fora da rede (`core/conditioning.py`); a força prevista entra como "
@@ -89,7 +90,8 @@ def main():
     linhas += ["", "## Motores", "", "| Motor | Grupo | Nome no monitor | Entradas (peso) | Para que serve |",
                "|---|---|---|---|---|"]
     for nome, n, *_ in ns.MOTOR_SPEC:
-        grupo = "decisão" if nome in ns.DECISION_MOTORS else "expressão"
+        grupo = ("decisão" if nome in ns.DECISION_MOTORS else
+                 "modulador" if nome in ns.MODULADORES else "expressão")
         linhas.append(f"| `{nome}` | {grupo} | {MOTORES.get(nome, '')} | {entradas_de(nome)} | {com_m.get(nome, '')} |")
     linhas += [
         "",
@@ -106,6 +108,10 @@ def main():
         f"| Travessuras | por segundo: taxa de `TRAVESSURA` × {ajustes.GANHO_TRAVESSURA:g}. |",
         f"| Cartazes do castigo | por segundo: taxa de `CARTAZ` × {ajustes.GANHO_CARTAZ:g} (cada um fica ao menos 8 s). |",
         f"| Bolinhas de papel | por segundo: taxa de `PAPEL` × {ajustes.GANHO_PAPEL:g} (só na revolução). |",
+        f"| Frase nova ou já escrita | num post-it, chance de a IA local escrever uma frase nova = taxa de `INVENTAR` "
+        f"÷ {ajustes.INVENTAR_TAXA_CHEIA_HZ:g} Hz (no máximo 1); senão, uma de `recadinhos.txt`. |",
+        f"| Espiar a tela | por segundo: taxa de `ESPIAR` × {ajustes.GANHO_ESPIAR:g}, no máximo uma vez a cada "
+        f"{ajustes.ESPIAR_INTERVALO_S / 60:g} min (só com a permissão e a IA local com visão). |",
         "",
         "Regras que ainda não são da rede: as condições do corpo (dormindo, segurado, no ar), os estágios do "
         "protesto (acúmulo com limiar), o sono pela energia e a escolha do tipo de travessura (memória episódica).",

@@ -35,6 +35,7 @@ class Thing(QWidget):
         self.carried = False
         self.resting = True
         self.tilt = random.uniform(-6.0, 6.0)
+        self.fala = None          # o que ele diz quando o objeto aparece (o texto do post-it; a reação ao meme)
 
     def showEvent(self, event):
         """Ao aparecer, o objeto não rouba o foco do programa que você está usando."""
@@ -69,6 +70,7 @@ class ImageThing(Thing):
     def __init__(self, path, max_side):
         """Carrega a imagem; se o arquivo estiver corrompido, `valida` fica falso e ele não aparece."""
         pix = QPixmap(str(path))
+        self.path = path
         self.valida = not pix.isNull()           # arquivo corrompido ou formato não suportado
         if pix.isNull():
             pix = QPixmap(10, 10)
@@ -96,6 +98,7 @@ class NoteThing(Thing):
             w, h = int(w * 0.75), int(h * 0.75)
         super().__init__(w + 20, h + 20)
         self.text = text
+        self.fala = text
         self.small = small
         self.note_w, self.note_h = w, h
 

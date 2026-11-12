@@ -12,7 +12,8 @@ from PySide6.QtCore import Qt, QRect
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QWidget
 
-from ..body.pet import set_no_activate
+from .. import plataforma
+from ..body.pet import set_no_activate, set_normal
 from ..mathutil import valor_real
 from ..store import read_json, write_json
 
@@ -52,11 +53,16 @@ def posicao_acessivel(salva, padrao, tamanho):
 
 
 class FloatingWidget(QWidget):
-    """Janela de painel que você pode arrastar, sempre por cima, sem roubar o foco."""
-    def __init__(self, app, key, title, size, minimum, default_pos):
+    """
+    Janela de painel que você pode arrastar, sem roubar o foco. `na_frente`: fica por cima de tudo, como o
+    pet (o notebook, a plaquinha do castigo); senão, no nível normal (monitor neural, painel de protesto):
+    quando você usa outro programa, ele fica por cima.
+    """
+    def __init__(self, app, key, title, size, minimum, default_pos, na_frente=True):
         """Cria o painel com título, tamanho (e tamanho mínimo) e a posição salva (ou a padrão)."""
-        super().__init__(None, Qt.FramelessWindowHint | Qt.Tool
-                         | Qt.WindowStaysOnTopHint | Qt.WindowDoesNotAcceptFocus)
+        flags = Qt.FramelessWindowHint | Qt.Tool | Qt.WindowDoesNotAcceptFocus
+        super().__init__(None, flags | Qt.WindowStaysOnTopHint if na_frente else flags)
+        self.na_frente = na_frente
         self.app = app
         self.key = key
         self.setWindowTitle(title)
@@ -69,7 +75,16 @@ class FloatingWidget(QWidget):
     def showEvent(self, event):
         """Ao aparecer, não rouba o foco do programa que você está usando."""
         super().showEvent(event)
-        set_no_activate(self)
+        (set_no_activate if self.na_frente else set_normal)(self)
+
+    def trazer_para_frente(self):
+        """Mostra e põe na frente das outras janelas (um painel normal pode estar atrás de outro programa)."""
+        self.show()
+        self.raise_()
+        try:
+            plataforma.trazer_para_frente(int(self.winId()))
+        except Exception:
+            pass
 
     def mousePressEvent(self, event):
         """Começa a arrastar o painel pelo clique."""

@@ -7,9 +7,11 @@ Os retângulos saem em pixels físicos (pontos x escala).
 
 import os
 import re
+import subprocess
 import threading
+from pathlib import Path
 
-from ._comum import rodar
+from ._comum import iniciar, rodar
 from PySide6.QtWidgets import QApplication
 from quickmachotkey import quickHotKey, mask
 from quickmachotkey.constants import (
@@ -24,6 +26,7 @@ OPCOES_NA_TELA = (1 << 0) | (1 << 4)        # OnScreenOnly | ExcludeDesktopEleme
 JANELA_NULA = 0
 PAINEL_SEM_ATIVAR = 1 << 7                  # NSWindowStyleMaskNonactivatingPanel
 EM_TODOS_OS_ESPACOS = (1 << 0) | (1 << 4) | (1 << 8)    # CanJoinAllSpaces | Stationary | FullScreenAuxiliary
+NIVEL_NORMAL = 0                            # NSNormalWindowLevel: outros programas podem ficar por cima
 _hotkey = None
 
 def _quartz():
@@ -154,8 +157,15 @@ def manter_na_frente(janela):
     janela.setCollectionBehavior_(EM_TODOS_OS_ESPACOS)
 
 
-def sem_foco_nativo(janela_id):
-    """A janela fica na frente de tudo, em todos os Spaces, e clicar nela não ativa o programa."""
+def deixar_normal(janela):
+    """Painel no nível normal: outros programas ficam por cima quando você usa eles, mas ele não some."""
+    janela.setHidesOnDeactivate_(False)
+    janela.setStyleMask_(janela.styleMask() | PAINEL_SEM_ATIVAR)    # clicar nele não rouba o foco
+    janela.setLevel_(NIVEL_NORMAL)
+
+
+def _ajustar(janela_id, ajuste):
+    """Aplica `ajuste` no NSWindow dono do id, só quando o id é mesmo um NSView (Qt no Cocoa)."""
     app = QApplication.instance()
     if app is None or app.platformName() != "cocoa":
         # Sem janela nativa (ex.: teste offscreen) o id não é um NSView e usá-lo derrubaria o processo.
@@ -163,9 +173,97 @@ def sem_foco_nativo(janela_id):
         return
     try:
         import objc
-        manter_na_frente(objc.objc_object(c_void_p=janela_id).window())
+        ajuste(objc.objc_object(c_void_p=janela_id).window())
     except Exception:
-        pass        # sem pyobjc: o pet funciona, mas volta a sumir ao trocar de programa
+        pass        # sem pyobjc: a janela funciona, só sem o ajuste
+
+
+def sem_foco_nativo(janela_id):
+    """A janela fica na frente de tudo, em todos os Spaces, e clicar nela não ativa o programa."""
+    _ajustar(janela_id, manter_na_frente)
+
+
+def janela_normal(janela_id):
+    """A janela (painel) fica no nível normal, não some ao trocar de programa e não rouba o foco."""
+    _ajustar(janela_id, deixar_normal)
+
+
+def trazer_para_frente(janela_id):
+    """Põe a janela na frente das outras, mesmo com o programa sem foco (abrir um painel pelo menu)."""
+    _ajustar(janela_id, lambda janela: janela.orderFrontRegardless())
+
+
+# ---------------- voz ----------------
+
+IDIOMA_DA_VOZ = "pt_BR"
+VOZ_PADRAO = "Luciana"              # vem em todo macOS com português
+_LINHA_DE_VOZ = re.compile(r"^(?P<nome>.+?)\s+(?P<idioma>[a-z]{2,3}_[A-Za-z0-9]+)\s+#")
+_vozes = None
+
+
+def ler_vozes(texto):
+    """Saída do `say -v ?` -> [(nome, idioma)]. O nome vem traduzido: 'Eddy (Português (Brasil))'."""
+    vozes = []
+    for linha in (texto or "").splitlines():
+        achou = _LINHA_DE_VOZ.match(linha)
+        if achou:
+            vozes.append((achou["nome"].strip(), achou["idioma"]))
+    return vozes
+
+
+def escolher_voz(pedido, vozes, idioma=IDIOMA_DA_VOZ):
+    """Nome completo da voz pedida no idioma ('Eddy' -> 'Eddy (Português (Brasil))'); senão a padrão; senão None."""
+    do_idioma = [nome for nome, idi in vozes if idi == idioma]
+    for procurado in (pedido, VOZ_PADRAO):
+        for nome in do_idioma if procurado else ():
+            if nome == procurado or nome.split(" (")[0] == procurado:
+                return nome
+    return do_idioma[0] if do_idioma else None
+
+
+def falar(texto, voz=None):
+    """Lê o texto com a voz do sistema (`say`), sem esperar. Devolve o processo, ou None."""
+    global _vozes
+    if _vozes is None:
+        _vozes = ler_vozes(rodar(["say", "-v", "?"], tempo=3.0))
+    nome = escolher_voz(voz, _vozes)
+    return iniciar(["say"] + (["-v", nome] if nome else []) + ["-f", "-"], entrada=texto)
+
+
+def tocar_audio(caminho):
+    """Toca um arquivo de áudio (WAV) com o `afplay`, sem esperar. Devolve o processo, ou None."""
+    return iniciar(["afplay", str(caminho)])
+
+
+# ---------------- print da tela (para o pet comentar) ----------------
+
+def capturar_tela(destino):
+    """Print do monitor principal com o `screencapture`, sem som. Roda em qualquer thread. True se salvou."""
+    try:
+        r = subprocess.run(["screencapture", "-x", "-m", "-t", "png", str(destino)], stdin=subprocess.DEVNULL,
+                           capture_output=True, timeout=10, check=False)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    caminho = Path(destino)
+    return r.returncode == 0 and caminho.exists() and caminho.stat().st_size > 0
+
+
+def permissao_tela():
+    """Já tem a permissão de Gravação de Tela? Só confere: não abre a pergunta do macOS."""
+    try:
+        import Quartz
+        return bool(Quartz.CGPreflightScreenCaptureAccess())
+    except Exception:
+        return False
+
+
+def pedir_permissao_tela():
+    """Abre a pergunta do macOS (só quando a pessoa clica no menu). True se já tinha a permissão."""
+    try:
+        import Quartz
+        return bool(Quartz.CGRequestScreenCaptureAccess())
+    except Exception:
+        return False
 
 
 def iniciar_atalho(callback):
