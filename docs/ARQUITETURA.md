@@ -41,12 +41,12 @@ Cada camada só importa das que estão à esquerda dela, além dos módulos comp
 | Camada | Responsabilidade | Qt | Depende do sistema |
 |---|---|:-:|:-:|
 | `core/` | Rede neural, emoção, homeostase, memória episódica, condicionamento, física, protesto | não | não |
-| `plataforma/` | Tudo que depende do sistema: janelas, teclado, tempo ocioso, atalho (um módulo por sistema) | não | sim |
+| `plataforma/` | Tudo que depende do sistema: janelas, teclado, tempo ocioso, atalho, voz e som (um módulo por sistema) | não | sim |
 | `sense/` | O que as leituras significam e registro da rotina | não | não (usa `plataforma/`) |
 | `body/` | Janela do pet, estado que ele mostra, comportamento, bolinha | sim | não (usa `plataforma/`) |
 | `world/` | Objetos na tela e a janela arrastável base | sim | não |
-| `mind/` | Controladores: ligam as decisões da rede à cena | sim | não |
-| `ui/` | Telas: permissões, bandeja, passo a passo, monitor, painel de protesto | sim | não (usa `plataforma/`) |
+| `mind/` | Controladores: ligam as decisões da rede à cena. Também a voz (o motor do OmniVoice roda em outro processo, com o Python de `voz_natural/`) e as frases com IA (o llama.cpp de `ia_local/` escreve o que a rede sente, num processo que abre e fecha a cada frase) | sim | não |
+| `ui/` | Telas: permissões, bandeja, passo a passo, monitor, painel de protesto, instalação da voz natural | sim | não (usa `plataforma/`) |
 | `controle/` | Mixins de `PestinhaApp`: sessão e interação | sim | não |
 | `app.py` | Composição e os três ciclos | sim | sim |
 

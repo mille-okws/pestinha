@@ -125,7 +125,8 @@ def test_configuracoes_pedem_o_foco_ao_abrir(monkeypatch):
     dialogo = Mock()
     monkeypatch.setattr("pestinha.controle.sessao.SettingsDialog", lambda *_a, **_k: dialogo)
     app = SimpleNamespace(settings=None, perms={}, paths=None, timeline=Mock(),
-                          apply_perms=Mock(), wipe_all_data=Mock())
+                          apply_perms=Mock(), wipe_all_data=Mock(),
+                          _voz_natural_vai_mudar=Mock(), _voz_natural_mudou=Mock())
     SessaoMixin.open_settings(app)
     dialogo.show.assert_called_once()
     dialogo.activateWindow.assert_called_once()

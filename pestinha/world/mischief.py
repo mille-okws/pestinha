@@ -25,6 +25,7 @@ class MischiefEngine(QObject):
     """Guarda os objetos na tela e decide a próxima travessura."""
 
     dismissed = Signal(object, float)     # (objeto, segundos que ficou na tela)
+    bilhete_novo = Signal(str)            # um post-it apareceu na tela (o texto dele, para a voz)
 
     def __init__(self, conteudo):
         """Guarda os objetos na tela (memes, bilhetes, fotos) e o conteúdo do pet para sorteá-los."""
@@ -104,6 +105,12 @@ class MischiefEngine(QObject):
             thing.clicked.connect(self._on_click)
         return thing
 
+    def bilhete(self, texto):
+        """Um post-it com este texto (a frase que a IA local escreveu), pronto para ser entregue."""
+        thing = NoteThing(texto)
+        thing.clicked.connect(self._on_click)
+        return thing
+
     # ---------------- colocação ----------------
 
     def show_in_corner(self, thing, bounds, cursor):
@@ -151,6 +158,8 @@ class MischiefEngine(QObject):
         """Põe um objeto na lista e o mostra."""
         self.things.append(thing)
         thing.show()
+        if isinstance(thing, NoteThing):
+            self.bilhete_novo.emit(thing.text)
 
     # ---------------- ciclo ----------------
 

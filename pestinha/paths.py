@@ -167,6 +167,16 @@ class ConteudoPaths:
         """Imagem do notebook."""
         return self.resolver("notebook.png")
 
+    @property
+    def voz_referencia(self):
+        """voz/referencia.wav: a voz dele na voz natural (o OmniVoice imita esse áudio em todas as frases)."""
+        return self.resolver("voz/referencia.wav")
+
+    @property
+    def voz_referencia_texto(self):
+        """voz/referencia.txt: o que é dito no referencia.wav, palavra por palavra."""
+        return self.resolver("voz/referencia.txt")
+
 
 @dataclass(frozen=True)
 class Paths:
@@ -200,6 +210,18 @@ class Paths:
     def pets(self):
         """`<pet>.json` (quem ele é) e a pasta `<pet>/` (as frases, cartazes e memes dele)."""
         return self.root / "pets"
+
+    @property
+    def voz_natural(self):
+        """A voz natural instalada (ambiente Python + modelo OmniVoice, uns 4,5 GB), ao lado do programa.
+        Fica fora de memory/: apagar os seus dados não apaga esse download."""
+        return self.root / "voz_natural"
+
+    @property
+    def ia_local(self):
+        """A IA local (em teste): o llama.cpp e o modelo de linguagem (uns 1,3 GB), ao lado do programa.
+        Fica fora de memory/: apagar os seus dados não apaga esse download."""
+        return self.root / "ia_local"
 
     def definicao(self, pet_id):
         """pets/<pet>.json: nome, semente da rede, temperamento. É o que faz um pet existir."""
@@ -240,6 +262,11 @@ class Paths:
         """Log do programa (sem conteúdo de janelas)."""
         return self.memory / "logs" / "pestinha.log"
 
+    @property
+    def log_voz(self):
+        """O que o motor da voz natural escreve (avisos do PyTorch, erros do modelo)."""
+        return self.memory / "logs" / "voz_natural.log"
+
     # ----- estado de cada personagem -----
 
     @property
@@ -251,6 +278,12 @@ class Paths:
     def legado(self):
         """Originais da versão antiga, guardados pela migração (nunca apagados automaticamente)."""
         return self.memory / "legado"
+
+    def voz(self, pet_id):
+        """Cache das falas que a voz natural gerou para o `pet_id` (memory/voz/<pet_id>/). Pode apagar à vontade."""
+        if not pet_id_valido(pet_id):
+            raise ValueError(f"id de pet inválido: {pet_id!r}")
+        return self.memory / "voz" / pet_id
 
     def pet(self, pet_id):
         """Arquivos de estado do personagem `pet_id` (memory/pets/<pet_id>/)."""

@@ -1,5 +1,34 @@
 # Histórico de versões
 
+## Frases com IA (em teste)
+
+- Novo item **Escrever o que está sentindo (IA)** no menu do pet: ele escreve um post-it novo sobre o que
+  sente, com o Qwen3.5-2B rodando no computador pelo llama.cpp. A rede neural decide o que ele sente
+  (emoção, cansaço, carência, tédio, protesto); o modelo só escreve.
+- Instalação pelo terminal: `python -m pestinha.mind.ia_local --instalar`. Baixa o llama.cpp pronto e o modelo
+  para `ia_local/`, com versão fixa e sha256 conferida, sem instalar nada no sistema nem no Python.
+- Cada frase abre o llama.cpp, gera e fecha (cerca de 1 s no macOS com Apple Silicon), então o modelo não fica
+  na memória. Respostas ruins são descartadas, e ele tenta de novo até 3 vezes.
+- Novo campo `personalidade` no `pets/<pet>.json`, usado no pedido ao modelo.
+
+## Voz: o pet lê os post-its e os cartazes
+
+- Nova opção **Falar os bilhetes e cartazes** (macOS, desligada por padrão). O pet lê em voz alta cada
+  post-it e cada cartaz que aparece. Uma frase nova interrompe a anterior, e fechar o post-it cala a fala.
+- **Voz natural** com o [OmniVoice](https://github.com/k2-fsa/OmniVoice), rodando no computador. Cada pet fala
+  com a voz dele e com a emoção da hora, em forma de risada, resmungo, suspiro ou susto e da velocidade.
+  Os cartazes de protesto saem bravos e os de abandono, tristes.
+- Tela **Voz natural...** em Configurações: confere se o computador aguenta (macOS 13+, Apple Silicon,
+  memória, disco, Python), explica o que vai ser baixado (uns 4,5 GB), instala mostrando o andamento e
+  remove. Também pelo terminal: `python -m pestinha.mind.voz_instalacao [--instalar | --remover]`.
+- O motor fica num ambiente Python separado (`voz_natural/`), num processo à parte. O Pestinha não passa a
+  depender do PyTorch, e o pet não trava enquanto a fala é gerada. As falas geradas ficam em
+  `memory/voz/<pet>/` e tocam na hora da segunda vez.
+- Bryan e Jorge vêm com a voz deles em `pets/<pet>/voz/referencia.wav`. Para trocar a voz, troque esse
+  arquivo e o `referencia.txt`, como explica o README.
+- Sem a voz natural (ou se ela falhar), o pet usa a voz do sistema (`say`), escolhida no campo `voz` do
+  `pets/<pet>.json`.
+
 ## macOS: o pet fica na frente de tudo
 
 - O pet, a bolinha e os painéis sumiam ao clicar em outro programa: o `Qt.Tool` vira um `NSPanel` com

@@ -13,6 +13,10 @@ escolhe o certo na importação. Os retângulos são em pixels físicos (o app d
     iniciar_atalho(callback)     Ctrl+Alt+Shift+B; devolve True se registrou
     cursor()                     (x, y) do cursor visto pelo sistema, ou None para usar o do Qt (só o kwin)
 
+Só no macOS, por enquanto (TEM_VOZ diz se existe; sem ela, as duas não fazem nada e devolvem None):
+    falar(texto, voz)            lê o texto com a voz do sistema, sem esperar; devolve o processo
+    tocar_audio(caminho)         toca um WAV, sem esperar; devolve o processo
+
 Só no Windows, por enquanto (TEM_INICIO_AUTOMATICO diz se existe):
     inicia_com_sistema()         o programa está marcado para abrir ao entrar no sistema
     definir_inicio_com_sistema(ligado)   liga ou desliga isso; devolve True se conseguiu
@@ -40,6 +44,10 @@ janelas_visiveis = _backend.janelas_visiveis
 sem_foco_nativo = _backend.sem_foco_nativo
 iniciar_atalho = _backend.iniciar_atalho
 cursor = getattr(_backend, "cursor", lambda: None)
+
+TEM_VOZ = hasattr(_backend, "falar")
+falar = getattr(_backend, "falar", lambda texto, voz=None: None)
+tocar_audio = getattr(_backend, "tocar_audio", lambda caminho: None)
 
 TEM_INICIO_AUTOMATICO = hasattr(_backend, "definir_inicio_com_sistema")
 inicia_com_sistema = getattr(_backend, "inicia_com_sistema", lambda: False)

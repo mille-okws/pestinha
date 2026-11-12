@@ -9,7 +9,7 @@ import os
 import re
 import threading
 
-from ._comum import rodar
+from ._comum import iniciar, rodar
 from PySide6.QtWidgets import QApplication
 from quickmachotkey import quickHotKey, mask
 from quickmachotkey.constants import (
@@ -166,6 +166,48 @@ def sem_foco_nativo(janela_id):
         manter_na_frente(objc.objc_object(c_void_p=janela_id).window())
     except Exception:
         pass        # sem pyobjc: o pet funciona, mas volta a sumir ao trocar de programa
+
+
+# ---------------- voz ----------------
+
+IDIOMA_DA_VOZ = "pt_BR"
+VOZ_PADRAO = "Luciana"              # vem em todo macOS com português
+_LINHA_DE_VOZ = re.compile(r"^(?P<nome>.+?)\s+(?P<idioma>[a-z]{2,3}_[A-Za-z0-9]+)\s+#")
+_vozes = None
+
+
+def ler_vozes(texto):
+    """Saída do `say -v ?` -> [(nome, idioma)]. O nome vem traduzido: 'Eddy (Português (Brasil))'."""
+    vozes = []
+    for linha in (texto or "").splitlines():
+        achou = _LINHA_DE_VOZ.match(linha)
+        if achou:
+            vozes.append((achou["nome"].strip(), achou["idioma"]))
+    return vozes
+
+
+def escolher_voz(pedido, vozes, idioma=IDIOMA_DA_VOZ):
+    """Nome completo da voz pedida no idioma ('Eddy' -> 'Eddy (Português (Brasil))'); senão a padrão; senão None."""
+    do_idioma = [nome for nome, idi in vozes if idi == idioma]
+    for procurado in (pedido, VOZ_PADRAO):
+        for nome in do_idioma if procurado else ():
+            if nome == procurado or nome.split(" (")[0] == procurado:
+                return nome
+    return do_idioma[0] if do_idioma else None
+
+
+def falar(texto, voz=None):
+    """Lê o texto com a voz do sistema (`say`), sem esperar. Devolve o processo, ou None."""
+    global _vozes
+    if _vozes is None:
+        _vozes = ler_vozes(rodar(["say", "-v", "?"], tempo=3.0))
+    nome = escolher_voz(voz, _vozes)
+    return iniciar(["say"] + (["-v", nome] if nome else []) + ["-f", "-"], entrada=texto)
+
+
+def tocar_audio(caminho):
+    """Toca um arquivo de áudio (WAV) com o `afplay`, sem esperar. Devolve o processo, ou None."""
+    return iniciar(["afplay", str(caminho)])
 
 
 def iniciar_atalho(callback):
