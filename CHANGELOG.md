@@ -1,5 +1,10 @@
 # Histórico de versões
 
+## Configurações: lista de personagens legível
+
+- Com o sistema no tema claro, a lista que abre no combo "Personagem" ficava com fundo branco e texto
+  verde-claro, e os nomes sumiam. Agora a lista usa as cores da tela, em qualquer tema do sistema.
+
 ## macOS: o pet fica na frente de tudo
 
 - O pet, a bolinha e os painéis sumiam ao clicar em outro programa: o `Qt.Tool` vira um `NSPanel` com

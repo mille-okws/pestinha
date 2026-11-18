@@ -41,6 +41,11 @@ QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 4px; }
 QCheckBox { color: #dfffe6; font-size: 13px; spacing: 8px; }
 QCheckBox:disabled { color: #4d6655; }
 QComboBox { background: #17201a; color: #dfffe6; border: 1px solid #2c5236; padding: 3px 6px; }
+/* A lista que abre herda o texto claro do combo, mas o fundo viria do tema do sistema
+   (branco no tema claro) e os itens ficariam ilegíveis. */
+QComboBox QAbstractItemView { background: #17201a; color: #dfffe6; border: 1px solid #2c5236;
+                              selection-background-color: #2c5236; selection-color: #ffffff;
+                              outline: none; }
 QPushButton { background: #17201a; color: #dfffe6; border: 1px solid #2c5236;
               border-radius: 6px; padding: 7px 18px; font-size: 13px; }
 QPushButton#start { background: #2c8a40; border-color: #63e56f; font-weight: bold; }
